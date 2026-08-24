@@ -1,0 +1,13 @@
+{
+  "itemGroup.project_cradle": "Example Mod Tab",
+  "block.project_cradle.example_block": "Example Block",
+  "item.project_cradle.example_item": "Example Item",
+
+  "project_cradle.configuration.title": "Project Cradle Configs",
+  "project_cradle.configuration.section.project_cradle.common.toml": "Project Cradle Configs",
+  "project_cradle.configuration.section.project_cradle.common.toml.title": "Project Cradle Configs",
+  "project_cradle.configuration.items": "Item List",
+  "project_cradle.configuration.logDirtBlock": "Log Dirt Block",
+  "project_cradle.configuration.magicNumberIntroduction": "Magic Number Text",
+  "project_cradle.configuration.magicNumber": "Magic Number"
+}
