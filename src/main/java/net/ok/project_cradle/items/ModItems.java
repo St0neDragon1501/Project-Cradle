@@ -22,8 +22,10 @@ import net.minecraft.world.item.Items;
 public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ProjectCradle.MODID);
 
-    public static final DeferredItem<Item> HOPE = ITEMS.registerItem("hope",
-            properties -> new HopeItem(properties.stacksTo(1)));
+    public static final DeferredItem<Item> SOUL_CRUSHER = ITEMS.registerItem("soul_crusher",
+            properties -> new SoulCrusherItem(properties.stacksTo(1)));
+    public static final DeferredItem<Item> TATTERED_MANUAL = ITEMS.registerItem("tattered_manual",
+            properties -> new TatteredManualItem(properties.stacksTo(1)));
   
     
     public static void register(IEventBus eventBus) {

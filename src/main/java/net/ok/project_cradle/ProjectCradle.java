@@ -83,7 +83,7 @@ public class ProjectCradle {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
 
     	if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-            event.accept(ModItems.HOPE); 
+            event.accept(ModItems.TATTERED_MANUAL); 
     	}
     }
 

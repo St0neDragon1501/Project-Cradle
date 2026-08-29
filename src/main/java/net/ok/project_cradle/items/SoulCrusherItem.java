@@ -13,9 +13,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class HopeItem extends Item {
+public class SoulCrusherItem extends Item {
 
-    public HopeItem(Properties properties) {
+    public SoulCrusherItem(Properties properties) {
         super(properties);
     }
 
@@ -30,11 +30,7 @@ public class HopeItem extends Item {
 
             Core core = player.getData(ModAttachments.CORE);
             
-            if(core.getALevel().equals(Utils.UNFOUNDED)) {
-            	core.setALevel(Utils.FOUNDATION);
-            } else {
-            	core.setALevel(Utils.UNFOUNDED);
-            }
+            core.setALevel(Utils.UNFOUNDED);
             
             player.sendSystemMessage(
                     Component.literal("Core " + core.getALevel())
