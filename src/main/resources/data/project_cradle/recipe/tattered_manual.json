@@ -1,0 +1,11 @@
+
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "project_cradle:madra_scale",
+    "minecraft:paper"
+  ],
+  "result": {
+    "id": "project_cradle:tattered_manual"
+  }
+}

@@ -27,6 +27,9 @@ public class ModItems {
     
     public static final DeferredItem<Item> TATTERED_MANUAL = ITEMS.registerItem("tattered_manual",
             properties -> new TatteredManualItem(properties.stacksTo(1)));
+    
+    public static final DeferredItem<Item> MADRA_SCALE = ITEMS.registerItem("madra_scale",
+            properties -> new Item(properties.stacksTo(1)));
   
     
     public static void register(IEventBus eventBus) {

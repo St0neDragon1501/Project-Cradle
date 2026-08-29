@@ -84,6 +84,7 @@ public class ProjectCradle {
 
     	if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.TATTERED_MANUAL); 
+            event.accept(ModItems.MADRA_SCALE); 
     	}
     }
 
