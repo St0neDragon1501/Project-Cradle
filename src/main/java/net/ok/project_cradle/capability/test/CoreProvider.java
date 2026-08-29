@@ -3,24 +3,24 @@ package net.ok.project_cradle.capability.test;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.capabilities.EntityCapability;
 
-public class AttunmentProvider {
+public class CoreProvider {
 
-    public static final EntityCapability<Shaper, Void> SHAPER =
+    public static final EntityCapability<Core, Void> CORE =
             EntityCapability.createVoid(
             		Identifier.fromNamespaceAndPath(
             		        "project_cradle",
-            		        "shaper"
+            		        "core"
             		),
-                    Shaper.class
+                    Core.class
             );
 
-    private final Shaper shaper;
+    private final Core core;
 
-    public AttunmentProvider() {
-        this.shaper = new Shaper();
+    public CoreProvider() {
+        this.core = new Core();
     }
 
-    public Shaper getShaper() {
-        return shaper;
+    public Core getCore() {
+        return core;
     }
 }

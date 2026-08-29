@@ -1,7 +1,8 @@
 package net.ok.project_cradle.items;
 
 import net.ok.project_cradle.capability.test.ModAttachments;
-import net.ok.project_cradle.capability.test.Shaper;
+import net.ok.project_cradle.utils.Utils;
+import net.ok.project_cradle.capability.test.Core;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -27,10 +28,16 @@ public class HopeItem extends Item {
 
         if (!level.isClientSide()) {
 
-            Shaper shaper = player.getData(ModAttachments.SHAPER);
-
+            Core core = player.getData(ModAttachments.CORE);
+            
+            if(core.getALevel().equals(Utils.UNFOUNDED)) {
+            	core.setALevel(Utils.FOUNDATION);
+            } else {
+            	core.setALevel(Utils.UNFOUNDED);
+            }
+            
             player.sendSystemMessage(
-                    Component.literal("Shaper " + shaper.getShaper())
+                    Component.literal("Core " + core.getALevel())
                             .withStyle(ChatFormatting.BOLD)
             );
         }

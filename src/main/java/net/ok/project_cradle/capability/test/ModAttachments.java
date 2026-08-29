@@ -16,9 +16,9 @@ public class ModAttachments {
                     ProjectCradle.MODID
             );
 
-    public static final Supplier<AttachmentType<Shaper>> SHAPER =
+    public static final Supplier<AttachmentType<Core>> CORE =
             ATTACHMENT_TYPES.register(
-                    "shaper",
-                    () -> AttachmentType.serializable(Shaper::new).build()
+                    "core",
+                    () -> AttachmentType.serializable(Core::new).build()
             );
 }

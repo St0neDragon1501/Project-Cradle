@@ -8,7 +8,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.test.ModAttachments;
-import net.ok.project_cradle.capability.test.Shaper;
+import net.ok.project_cradle.capability.test.Core;
 
 @EventBusSubscriber(modid = ProjectCradle.MODID)
 public class ModEvents {
@@ -21,10 +21,10 @@ public class ModEvents {
             Player original = event.getOriginal();
             Player newPlayer = event.getEntity();
 
-            Shaper oldShaper = original.getData(ModAttachments.SHAPER);
-            Shaper newShaper = newPlayer.getData(ModAttachments.SHAPER);
+            Core oldShaper = original.getData(ModAttachments.CORE);
+            Core newShaper = newPlayer.getData(ModAttachments.CORE);
 
-            newShaper.copyFromShaper(oldShaper);
+            newShaper.copyFromCore(oldShaper);
         }
     }
 }
