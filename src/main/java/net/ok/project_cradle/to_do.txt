@@ -1,2 +1,24 @@
-Heyo.
-hey this is me
+
+
+
+	Beta
+Foundation -> copper 
+{different advancements and the ability to advance} 
+
+Madra 
+{Madra the capability as well as it’s types} 
+
+Foundation Cycling 
+{the basic ability to detect blocks around the player} 
+
+Techniques 
+{we add some basic techniques} 
+
+
+Ways to implement them 
+
+* Keys {Add an advance key, a cycle key (have some kind of spell wheel)}
+
+Cycling madra 
+Technique Set up
+Adding a technique renderer 
