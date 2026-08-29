@@ -24,6 +24,7 @@ public class ModItems {
 
     public static final DeferredItem<Item> SOUL_CRUSHER = ITEMS.registerItem("soul_crusher",
             properties -> new SoulCrusherItem(properties.stacksTo(1)));
+    
     public static final DeferredItem<Item> TATTERED_MANUAL = ITEMS.registerItem("tattered_manual",
             properties -> new TatteredManualItem(properties.stacksTo(1)));
   
