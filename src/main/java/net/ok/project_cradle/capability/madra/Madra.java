@@ -20,6 +20,10 @@ public class Madra implements ValueIOSerializable {
     public void setALevel(Double aLevel) {
         this.aLevel = aLevel;
     }
+    
+    public void addMadra(double amount) {
+        this.aLevel += amount;
+    }
 
     public void copyFromMadra(Madra source) {
         this.aLevel = source.aLevel;

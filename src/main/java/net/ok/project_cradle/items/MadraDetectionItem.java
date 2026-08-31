@@ -33,6 +33,7 @@ public class MadraDetectionItem extends Item {
         if (!level.isClientSide()) {
             Madra madra = player.getData(ModAttachments.MADRA);
             
+            madra.addMadra(5.0);
             
             player.sendSystemMessage(Component.literal("Madra " + madra.getALevel()).withStyle(ChatFormatting.BOLD));
             
