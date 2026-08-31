@@ -7,8 +7,9 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import net.ok.project_cradle.ProjectCradle;
-import net.ok.project_cradle.capability.test.ModAttachments;
-import net.ok.project_cradle.capability.test.Core;
+import net.ok.project_cradle.capability.ModAttachments;
+import net.ok.project_cradle.capability.core.Core;
+import net.ok.project_cradle.capability.madra.Madra;
 
 @EventBusSubscriber(modid = ProjectCradle.MODID)
 public class ModEvents {
@@ -23,8 +24,20 @@ public class ModEvents {
 
             Core oldShaper = original.getData(ModAttachments.CORE);
             Core newShaper = newPlayer.getData(ModAttachments.CORE);
-
+            
             newShaper.copyFromCore(oldShaper);
+            
+            Player originalMadra = event.getOriginal();
+            Player newPlayerMadra = event.getEntity();
+
+            Core oldShaperMadra = originalMadra.getData(ModAttachments.CORE);
+            Core newShaperMadra = newPlayerMadra.getData(ModAttachments.CORE);
+            
+            newShaperMadra.copyFromCore(oldShaperMadra);
         }
+        
+        
     }
+    
+    
 }

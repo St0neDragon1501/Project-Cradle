@@ -30,6 +30,9 @@ public class ModItems {
     
     public static final DeferredItem<Item> MADRA_SCALE = ITEMS.registerItem("madra_scale",
             properties -> new Item(properties.stacksTo(1)));
+    
+    public static final DeferredItem<Item> MADRA_DETETION = ITEMS.registerItem("madra_dertetion",
+            properties -> new MadraDetectionItem(properties.stacksTo(1)));
   
     
     public static void register(IEventBus eventBus) {

@@ -1,4 +1,4 @@
-package net.ok.project_cradle.capability.test;
+package net.ok.project_cradle.capability.core;
 
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.capabilities.EntityCapability;

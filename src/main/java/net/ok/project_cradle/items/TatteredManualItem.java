@@ -1,9 +1,8 @@
 package net.ok.project_cradle.items;
 
-import net.ok.project_cradle.capability.test.ModAttachments;
+import net.ok.project_cradle.capability.ModAttachments;
+import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.utils.Utils;
-import net.ok.project_cradle.capability.test.Core;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;

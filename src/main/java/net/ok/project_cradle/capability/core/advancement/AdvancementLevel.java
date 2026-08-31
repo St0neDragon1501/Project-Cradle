@@ -1,4 +1,4 @@
-package net.ok.project_cradle.capability.test.advancementLevels;
+package net.ok.project_cradle.capability.core.advancement;
 
 public abstract class AdvancementLevel {
 	
