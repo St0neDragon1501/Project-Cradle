@@ -8,7 +8,7 @@ import net.neoforged.neoforge.common.util.ValueIOSerializable;
 
 public class Madra implements ValueIOSerializable {
 
-    private Double aLevel = 1000.0;
+    private Double aLevel = 0.0;
 
     public Madra() {
     }
@@ -21,8 +21,8 @@ public class Madra implements ValueIOSerializable {
         this.aLevel = aLevel;
     }
     
-    public void addMadra(double amount) {
-        this.aLevel += amount;
+    public void addMadra(double amount, double maxMadra) {
+        this.aLevel = Math.min(this.aLevel + amount, maxMadra);
     }
 
     public void copyFromMadra(Madra source) {

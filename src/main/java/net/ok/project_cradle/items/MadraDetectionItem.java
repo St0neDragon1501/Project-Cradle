@@ -3,6 +3,7 @@ package net.ok.project_cradle.items;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.madra.Madra;
+import net.ok.project_cradle.capability.madra.MaxMadra;
 import net.ok.project_cradle.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -32,8 +33,9 @@ public class MadraDetectionItem extends Item {
 
         if (!level.isClientSide()) {
             Madra madra = player.getData(ModAttachments.MADRA);
-            
-            madra.addMadra(5.0);
+            MaxMadra maxMadra = player.getData(ModAttachments.MAXMADRA);
+
+            madra.addMadra(10.0, maxMadra.getLevel());
             
             player.sendSystemMessage(Component.literal("Madra " + madra.getALevel()).withStyle(ChatFormatting.BOLD));
             

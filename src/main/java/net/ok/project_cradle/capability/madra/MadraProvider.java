@@ -5,7 +5,7 @@ import net.neoforged.neoforge.capabilities.EntityCapability;
 
 public class MadraProvider {
 
-    public static final EntityCapability<Madra, Void> CORE =
+    public static final EntityCapability<Madra, Void> MADRA =
             EntityCapability.createVoid(
             		Identifier.fromNamespaceAndPath(
             		        "project_cradle",
@@ -16,11 +16,32 @@ public class MadraProvider {
 
     private final Madra madra;
 
-    public MadraProvider() {
-        this.madra = new Madra();
-    }
+    
 
-    public Madra getCore() {
+    public Madra getMadra() {
         return madra;
     }
+    
+    public static final EntityCapability<MaxMadra, Void> MAXMADRA =
+            EntityCapability.createVoid(
+            		Identifier.fromNamespaceAndPath(
+            		        "project_cradle",
+            		        "max_madra"
+            		),
+                    MaxMadra.class
+            );
+
+    private final MaxMadra max_madra;
+
+    
+
+    public MaxMadra getMaxMadra() {
+        return max_madra;
+    }
+    
+    public MadraProvider() {
+        this.madra = new Madra();
+        this.max_madra = new MaxMadra();
+    }
+    
 }

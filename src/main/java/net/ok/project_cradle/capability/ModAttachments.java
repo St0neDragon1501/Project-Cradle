@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.core.Core;
-import net.ok.project_cradle.capability.madra.Madra;
+import net.ok.project_cradle.capability.madra.*;
 
 public class ModAttachments {
 
@@ -18,15 +18,27 @@ public class ModAttachments {
                     ProjectCradle.MODID
             );
 
+    
     public static final Supplier<AttachmentType<Core>> CORE =
             ATTACHMENT_TYPES.register(
                     "core",
                     () -> AttachmentType.serializable(Core::new).build()
             );
     
+    
     public static final Supplier<AttachmentType<Madra>> MADRA =
             ATTACHMENT_TYPES.register(
                     "madra",
                     () -> AttachmentType.serializable(Madra::new).build()
             );
+    
+    
+    public static final Supplier<AttachmentType<MaxMadra>> MAXMADRA =
+            ATTACHMENT_TYPES.register(
+                    "max_madra",
+                    () -> AttachmentType.serializable(MaxMadra::new).build()
+            );
+    
+    
+    
 }

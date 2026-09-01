@@ -10,6 +10,7 @@ import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.madra.Madra;
+import net.ok.project_cradle.capability.madra.MaxMadra;
 
 @EventBusSubscriber(modid = ProjectCradle.MODID)
 public class ModEvents {
@@ -21,19 +22,33 @@ public class ModEvents {
 
             Player original = event.getOriginal();
             Player newPlayer = event.getEntity();
-
-            Core oldShaper = original.getData(ModAttachments.CORE);
-            Core newShaper = newPlayer.getData(ModAttachments.CORE);
             
-            newShaper.copyFromCore(oldShaper);
+            Core oldCoreShaper = original.getData(ModAttachments.CORE);
+            Core newCoreShaper = newPlayer.getData(ModAttachments.CORE);
+            
+            newCoreShaper.copyFromCore(oldCoreShaper);
+            
+            
             
             Player originalMadra = event.getOriginal();
             Player newPlayerMadra = event.getEntity();
-
-            Core oldShaperMadra = originalMadra.getData(ModAttachments.CORE);
-            Core newShaperMadra = newPlayerMadra.getData(ModAttachments.CORE);
             
-            newShaperMadra.copyFromCore(oldShaperMadra);
+            Madra oldMadraShaper = originalMadra.getData(ModAttachments.MADRA);
+            Madra newMadraShaper = newPlayerMadra.getData(ModAttachments.MADRA);
+
+            newMadraShaper.copyFromMadra(oldMadraShaper);
+            
+            
+            
+            Player originalMaxMadra = event.getOriginal();
+            Player newPlayerMaxMadra = event.getEntity();
+            
+            MaxMadra oldMaxMadraShaper = originalMaxMadra.getData(ModAttachments.MAXMADRA);
+            MaxMadra newMaxMadraShaper = newPlayerMaxMadra.getData(ModAttachments.MAXMADRA);
+
+            newMaxMadraShaper.copyFromMaxMadra(oldMaxMadraShaper);
+            
+            
         }
         
         

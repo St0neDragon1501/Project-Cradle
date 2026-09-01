@@ -51,6 +51,8 @@ public class ProjectCradle {
         
         ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
         
+        
+        
         ModItems.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
