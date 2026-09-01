@@ -32,12 +32,12 @@ public class MadraDetectionItem extends Item {
     ) {
 
         if (!level.isClientSide()) {
-            Madra madra = player.getData(ModAttachments.MADRA);
+            
             MaxMadra maxMadra = player.getData(ModAttachments.MAXMADRA);
 
-            madra.addMadra(10.0, maxMadra.getLevel());
+            maxMadra.addMaxMadra(10);
             
-            player.sendSystemMessage(Component.literal("Madra " + madra.getALevel()).withStyle(ChatFormatting.BOLD));
+            player.sendSystemMessage(Component.literal("Madra " + maxMadra.getLevel()).withStyle(ChatFormatting.BOLD));
             
         }
 

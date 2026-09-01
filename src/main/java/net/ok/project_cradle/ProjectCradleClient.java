@@ -10,7 +10,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.ok.project_cradle.keymapping.ModKeyMappings;
+import net.ok.project_cradle.networking.packet.TestPacketC2S;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
@@ -47,6 +49,7 @@ public class ProjectCradleClient {
         while(ModKeyMappings.PRESS_CYCLING.get().consumeClick()) {
             // IN HERE: WE ARE ON THE CLIENT!
             Minecraft.getInstance().player.sendSystemMessage(Component.literal("You core feels bright!"));
+            ClientPacketDistributor.sendToServer(new TestPacketC2S("Testing Pack", 67));
         }
     }
     

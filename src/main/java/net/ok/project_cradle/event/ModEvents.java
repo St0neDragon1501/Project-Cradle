@@ -5,12 +5,16 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.HandlerThread;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.madra.Madra;
 import net.ok.project_cradle.capability.madra.MaxMadra;
+import net.ok.project_cradle.networking.ClientPayloadHandler;
+import net.ok.project_cradle.networking.packet.TestPacketC2S;
 
 @EventBusSubscriber(modid = ProjectCradle.MODID)
 public class ModEvents {
@@ -52,6 +56,14 @@ public class ModEvents {
         }
         
         
+    }
+    
+    @SubscribeEvent
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1")
+                .executesOn(HandlerThread.MAIN);
+
+        registrar.playToServer(TestPacketC2S.TYPE, TestPacketC2S.STREAM_CODEC, ClientPayloadHandler::handleTestPacket);
     }
     
     
