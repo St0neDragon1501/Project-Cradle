@@ -13,6 +13,10 @@ public class Madra implements ValueIOSerializable {
     public Madra() {
     }
 
+    public Madra(Double aLevel) {
+        this.aLevel = aLevel;
+    }
+
     public Double getALevel() {
         return aLevel;
     }
@@ -23,6 +27,15 @@ public class Madra implements ValueIOSerializable {
     
     public void addMadra(double amount, double maxMadra) {
         this.aLevel = Math.min(this.aLevel + amount, maxMadra);
+    }
+
+    public boolean trySpendMadra(double amount) {
+        if (!Double.isFinite(amount) || amount <= 0.0 || this.aLevel < amount) {
+            return false;
+        }
+
+        this.aLevel -= amount;
+        return true;
     }
 
     public void copyFromMadra(Madra source) {

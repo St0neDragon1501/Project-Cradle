@@ -13,6 +13,10 @@ public class MaxMadra implements ValueIOSerializable {
     public MaxMadra() {
     }
 
+    public MaxMadra(Double aLevel) {
+        this.aLevel = aLevel;
+    }
+
     public Double getLevel() {
         return aLevel;
     }

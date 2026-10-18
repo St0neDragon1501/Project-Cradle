@@ -36,6 +36,7 @@ public class MadraDetectionItem extends Item {
             MaxMadra maxMadra = player.getData(ModAttachments.MAXMADRA);
 
             maxMadra.addMaxMadra(10);
+            player.syncData(ModAttachments.MAXMADRA);
             
             player.sendSystemMessage(Component.literal("Madra " + maxMadra.getLevel()).withStyle(ChatFormatting.BOLD));
             
