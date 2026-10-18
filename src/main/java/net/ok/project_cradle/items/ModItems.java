@@ -33,6 +33,12 @@ public class ModItems {
     
     public static final DeferredItem<Item> MADRA_DETETION = ITEMS.registerItem("madra_dertetion",
             properties -> new MadraDetectionItem(properties.stacksTo(1)));
+
+    public static final DeferredItem<Item> BASIC_STRIKER = ITEMS.registerItem("basic_striker",
+            properties -> new BasicStrikerItem(properties.stacksTo(1)));
+
+    public static final DeferredItem<Item> MADRA_TYPE_TUNER = ITEMS.registerItem("madra_type_tuner",
+            properties -> new MadraTypeTunerItem(properties.stacksTo(1)));
   
     
     public static void register(IEventBus eventBus) {

@@ -1,9 +1,26 @@
 {
   "item.project_cradle.soul_crusher": "Soul Crusher",
   "item.project_cradle.madra_scale": "Madra Scale",
-  "item.project_cradle.tattered_manual": "Tattered Manual", 
-  "item.project_cradle.madra_dertetion": "Hope", 
-  
-  
-  "key.project_cradle.cycling" : "Cycling"
+  "item.project_cradle.tattered_manual": "Tattered Manual",
+  "item.project_cradle.madra_dertetion": "Hope",
+  "item.project_cradle.basic_striker": "Basic Striker",
+  "item.project_cradle.madra_type_tuner": "Madra Type Tuner",
+  "entity.project_cradle.basic_striker": "Basic Striker",
+  "madra_type.project_cradle.fire": "Fire",
+  "madra_type.project_cradle.water": "Water",
+  "madra_type.project_cradle.air": "Air",
+  "madra_type.project_cradle.earth": "Earth",
+  "hud.project_cradle.madra_types": "Madra Types: %s",
+  "message.project_cradle.not_enough_madra": "Not enough Madra to cast Basic Striker (cost: %s).",
+  "message.project_cradle.madra_types_changed": "Madra types: %s",
+  "key.category.project_cradle.controls": "Project Cradle",
+  "key.project_cradle.cycling": "Cycling",
+  "key.project_cradle.string_1": "Drop Quick Slot 1",
+  "key.project_cradle.string_2": "Drop Quick Slot 2",
+  "key.project_cradle.string_3": "Drop Quick Slot 3",
+  "key.project_cradle.string_4": "Drop Quick Slot 4",
+  "key.project_cradle.string_5": "Drop Quick Slot 5",
+  "key.project_cradle.string_6": "Open Quick Drop Slots",
+  "container.project_cradle.quick_drop": "Quick Drop Slots",
+  "hud.project_cradle.madra": "Madra: %s / %s"
 }
