@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": ["minecraft:amethyst_shard", "minecraft:echo_shard", "minecraft:diamond"],
+  "result": {"id": "project_cradle:icon_echo", "count": 1}
+}

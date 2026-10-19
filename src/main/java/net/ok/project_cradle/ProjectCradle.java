@@ -7,6 +7,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.entities.ModEntities;
 import net.ok.project_cradle.items.ModItems;
+import net.ok.project_cradle.items.ModCreativeTabs;
 import net.ok.project_cradle.menus.ModMenus;
 
 @Mod(ProjectCradle.MODID)
@@ -17,6 +18,7 @@ public final class ProjectCradle {
         ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
+        ModCreativeTabs.register(modEventBus);
         ModMenus.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

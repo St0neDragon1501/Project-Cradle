@@ -1,0 +1,1 @@
+{"parent":"project_cradle:unlock_madra","display":{"icon":{"id":"minecraft:gold_ingot"},"title":{"translate":"advancements.project_cradle.reach_lowgold.title"},"description":{"translate":"advancements.project_cradle.reach_lowgold.description"},"frame":"task","show_toast":true,"announce_to_chat":true},"criteria":{"reached":{"trigger":"minecraft:impossible"}}}

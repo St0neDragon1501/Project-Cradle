@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" L ", "IBI", " A "],
+  "key": {
+    "L": "minecraft:leather",
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:blaze_powder",
+    "A": "minecraft:amethyst_shard"
+  },
+  "result": {"id": "project_cradle:enforcer_technique"}
+}

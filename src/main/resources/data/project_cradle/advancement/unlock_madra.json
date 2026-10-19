@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:story/root",
+  "display": {
+    "icon": {"id": "project_cradle:foundation_cycling_technique"},
+    "title": {"translate": "advancements.project_cradle.unlock_madra.title"},
+    "description": {"translate": "advancements.project_cradle.unlock_madra.description"},
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {"unlocked": {"trigger": "minecraft:impossible"}}
+}

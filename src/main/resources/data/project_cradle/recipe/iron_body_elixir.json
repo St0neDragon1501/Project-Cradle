@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": ["minecraft:golden_apple", "minecraft:iron_ingot", "minecraft:blaze_powder"],
+  "result": {"id": "project_cradle:iron_body_elixir", "count": 1}
+}

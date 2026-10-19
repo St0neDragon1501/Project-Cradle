@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": ["minecraft:glass_bottle", "minecraft:blaze_powder", "minecraft:soul_sand", "project_cradle:sacred_herb"],
+  "result": {"id": "project_cradle:soulfire_phial", "count": 1}
+}

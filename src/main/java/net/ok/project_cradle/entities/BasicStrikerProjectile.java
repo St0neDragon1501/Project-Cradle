@@ -15,26 +15,42 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.ok.project_cradle.capability.madra.MadraType;
 import net.ok.project_cradle.items.ModItems;
+import net.ok.project_cradle.server.spells.MadraAspectEffects;
+import net.ok.project_cradle.server.spells.TechniqueCombatService;
+import net.ok.project_cradle.server.spells.ProjectileTerrainPassives;
 
 public class BasicStrikerProjectile extends ThrowableItemProjectile {
     private static final EntityDataAccessor<Integer> DATA_MADRA_ELEMENT = SynchedEntityData.defineId(
             BasicStrikerProjectile.class,
             EntityDataSerializers.INT
     );
+    private static final EntityDataAccessor<Float> DATA_SPELL_DAMAGE = SynchedEntityData.defineId(
+            BasicStrikerProjectile.class,
+            EntityDataSerializers.FLOAT
+    );
 
-    private static final double MAX_TRAVEL_DISTANCE = 5.0;
+    private double maxTravelDistance = 5.0;
     private double distanceTravelled;
+    private boolean burnOnHit;
 
     public BasicStrikerProjectile(EntityType<? extends BasicStrikerProjectile> type, Level level) {
         super(type, level);
     }
 
     public BasicStrikerProjectile(Level level, LivingEntity owner, ItemStack itemStack) {
-        super(ModEntities.BASIC_STRIKER_PROJECTILE.get(), owner, level, itemStack);
+        this(ModEntities.BASIC_STRIKER_PROJECTILE.get(), level, owner, itemStack);
+    }
+
+    public BasicStrikerProjectile(EntityType<? extends BasicStrikerProjectile> type, Level level,
+            LivingEntity owner, ItemStack itemStack) {
+        super(type, owner, level, itemStack);
     }
 
     @Override
@@ -50,10 +66,29 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
         return MadraType.Element.byOrdinal(this.getEntityData().get(DATA_MADRA_ELEMENT));
     }
 
+    public void setSpellDamage(float damage) {
+        this.getEntityData().set(DATA_SPELL_DAMAGE, Math.max(0.0F, damage));
+    }
+
+    public void setMaxTravelDistance(double distance) {
+        if (Double.isFinite(distance) && distance > 0.0) {
+            this.maxTravelDistance = distance;
+        }
+    }
+
+    public void setBurnOnHit(boolean burnOnHit) {
+        this.burnOnHit = burnOnHit;
+    }
+
+    private float getSpellDamage() {
+        return this.getEntityData().get(DATA_SPELL_DAMAGE);
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_MADRA_ELEMENT, MadraType.Element.FIRE.ordinal());
+        builder.define(DATA_SPELL_DAMAGE, 6.0F);
     }
 
     @Override
@@ -65,7 +100,7 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
     public void tick() {
         if (!this.level().isClientSide()) {
             Vec3 movement = this.getDeltaMovement();
-            double remainingDistance = MAX_TRAVEL_DISTANCE - this.distanceTravelled;
+            double remainingDistance = this.maxTravelDistance - this.distanceTravelled;
             double movementLength = movement.length();
             if (movementLength > remainingDistance && movementLength > 0.0) {
                 this.setDeltaMovement(movement.scale(remainingDistance / movementLength));
@@ -99,7 +134,7 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
         super.tick();
         if (!this.level().isClientSide() && this.isAlive()) {
             this.distanceTravelled += previousPosition.distanceTo(this.position());
-            if (this.distanceTravelled >= MAX_TRAVEL_DISTANCE) {
+            if (this.distanceTravelled >= this.maxTravelDistance) {
                 this.disperse();
             }
         }
@@ -107,16 +142,34 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult hitResult) {
-        Entity target = hitResult.getEntity();
-        target.hurt(this.damageSources().indirectMagic(this, this.getOwner()), 6.0F);
+        if (this.level().isClientSide()) {
+            return;
+        }
 
-        Vec3 direction = this.getDeltaMovement().normalize();
-        target.push(direction.x * 0.3, 0.12, direction.z * 0.3);
-        target.hurtMarked = true;
+        Entity target = hitResult.getEntity();
+        float damage = this.getSpellDamage() + MadraAspectEffects.bonusDamage(this.getMadraElement());
+        boolean landed = this.getOwner() instanceof ServerPlayer caster
+                ? TechniqueCombatService.hurt(caster, this, target, damage)
+                : target.hurtServer((ServerLevel) this.level(), this.damageSources().indirectMagic(this, this.getOwner()), damage);
+        if (!landed) return;
+        MadraAspectEffects.apply(this, target);
+        if (this.burnOnHit && target instanceof LivingEntity livingTarget) {
+            livingTarget.igniteForSeconds(5.0F);
+        }
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult hitResult) {
+        super.onHitBlock(hitResult);
+        ProjectileTerrainPassives.onHit(this, hitResult);
     }
 
     @Override
     protected void onHit(HitResult hitResult) {
+        if (this.level().isClientSide()) {
+            return;
+        }
+
         super.onHit(hitResult);
         this.disperse();
     }
@@ -144,6 +197,17 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
             case WATER -> ParticleTypes.BUBBLE;
             case AIR -> ParticleTypes.CLOUD;
             case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
+            case PURE -> ParticleTypes.ENCHANT;
+            case LIFE -> ParticleTypes.HAPPY_VILLAGER;
+            case DEATH -> ParticleTypes.SOUL;
+            case LIGHT -> ParticleTypes.END_ROD;
+            case SHADOW -> ParticleTypes.SMOKE;
+            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
+            case DREAM -> ParticleTypes.WITCH;
+            case DESTRUCTION -> ParticleTypes.EXPLOSION;
+            case FORCE -> ParticleTypes.GUST;
+            case SWORD -> ParticleTypes.CRIT;
+            case HUNGER -> ParticleTypes.SQUID_INK;
         };
     }
 
@@ -153,6 +217,17 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
             case WATER -> ParticleTypes.SPLASH;
             case AIR -> ParticleTypes.SWEEP_ATTACK;
             case EARTH -> ParticleTypes.POOF;
+            case PURE -> ParticleTypes.ENCHANTED_HIT;
+            case LIFE -> ParticleTypes.COMPOSTER;
+            case DEATH -> ParticleTypes.SOUL_FIRE_FLAME;
+            case LIGHT -> ParticleTypes.GLOW;
+            case SHADOW -> ParticleTypes.LARGE_SMOKE;
+            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
+            case DREAM -> ParticleTypes.PORTAL;
+            case DESTRUCTION -> ParticleTypes.EXPLOSION_EMITTER;
+            case FORCE -> ParticleTypes.SMALL_GUST;
+            case SWORD -> ParticleTypes.SWEEP_ATTACK;
+            case HUNGER -> ParticleTypes.GLOW_SQUID_INK;
         };
     }
 
@@ -162,6 +237,17 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
             case WATER -> ParticleTypes.SPLASH;
             case AIR -> ParticleTypes.CLOUD;
             case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
+            case PURE -> ParticleTypes.ENCHANT;
+            case LIFE -> ParticleTypes.HEART;
+            case DEATH -> ParticleTypes.SOUL;
+            case LIGHT -> ParticleTypes.END_ROD;
+            case SHADOW -> ParticleTypes.SMOKE;
+            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
+            case DREAM -> ParticleTypes.WITCH;
+            case DESTRUCTION -> ParticleTypes.EXPLOSION;
+            case FORCE -> ParticleTypes.GUST;
+            case SWORD -> ParticleTypes.CRIT;
+            case HUNGER -> ParticleTypes.SQUID_INK;
         };
     }
 
@@ -171,6 +257,17 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
             case WATER -> ParticleTypes.BUBBLE;
             case AIR -> ParticleTypes.SWEEP_ATTACK;
             case EARTH -> ParticleTypes.POOF;
+            case PURE -> ParticleTypes.ENCHANTED_HIT;
+            case LIFE -> ParticleTypes.HAPPY_VILLAGER;
+            case DEATH -> ParticleTypes.SOUL_FIRE_FLAME;
+            case LIGHT -> ParticleTypes.GLOW;
+            case SHADOW -> ParticleTypes.LARGE_SMOKE;
+            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
+            case DREAM -> ParticleTypes.PORTAL;
+            case DESTRUCTION -> ParticleTypes.EXPLOSION_EMITTER;
+            case FORCE -> ParticleTypes.SMALL_GUST;
+            case SWORD -> ParticleTypes.SWEEP_ATTACK;
+            case HUNGER -> ParticleTypes.GLOW_SQUID_INK;
         };
     }
 

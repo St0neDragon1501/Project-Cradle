@@ -6,8 +6,14 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.HandlerThread;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.ok.project_cradle.ProjectCradle;
+import net.ok.project_cradle.server.networking.CyclingPayloadHandler;
+import net.ok.project_cradle.server.networking.QuickDropKeyPayloadHandler;
+import net.ok.project_cradle.server.networking.TechniqueWheelPayloadHandler;
+import net.ok.project_cradle.networking.packet.CycleC2S;
+import net.ok.project_cradle.networking.packet.ToggleAirFlightC2S;
+import net.ok.project_cradle.server.networking.AirFlightPayloadHandler;
 import net.ok.project_cradle.networking.packet.QuickDropKeyC2S;
-import net.ok.project_cradle.networking.packet.TestPacketC2S;
+import net.ok.project_cradle.networking.packet.SelectTechniqueC2S;
 
 @EventBusSubscriber(modid = ProjectCradle.MODID)
 public final class ModNetworking {
@@ -16,8 +22,11 @@ public final class ModNetworking {
 
     @SubscribeEvent
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1").executesOn(HandlerThread.MAIN);
+        PayloadRegistrar registrar = event.registrar("4").executesOn(HandlerThread.MAIN);
+        registrar.playToServer(ToggleAirFlightC2S.TYPE, ToggleAirFlightC2S.STREAM_CODEC, AirFlightPayloadHandler::handle);
+        registrar.playToServer(CycleC2S.TYPE, CycleC2S.STREAM_CODEC, CyclingPayloadHandler::handle);
         registrar.playToServer(QuickDropKeyC2S.TYPE, QuickDropKeyC2S.STREAM_CODEC, QuickDropKeyPayloadHandler::handle);
-        registrar.playToServer(TestPacketC2S.TYPE, TestPacketC2S.STREAM_CODEC, MadraTestPayloadHandler::handle);
+        registrar.playToServer(SelectTechniqueC2S.TYPE, SelectTechniqueC2S.STREAM_CODEC,
+                TechniqueWheelPayloadHandler::handle);
     }
 }

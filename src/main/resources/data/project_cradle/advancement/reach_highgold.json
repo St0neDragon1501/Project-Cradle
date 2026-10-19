@@ -1,0 +1,1 @@
+{"parent":"project_cradle:unlock_madra","display":{"icon":{"id":"minecraft:gold_block"},"title":{"translate":"advancements.project_cradle.reach_highgold.title"},"description":{"translate":"advancements.project_cradle.reach_highgold.description"},"frame":"task","show_toast":true,"announce_to_chat":true},"criteria":{"reached":{"trigger":"minecraft:impossible"}}}

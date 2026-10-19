@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": ["project_cradle:madra_scale", "minecraft:compass", "minecraft:redstone"],
+  "result": {"id": "project_cradle:madra_dertetion", "count": 1}
+}

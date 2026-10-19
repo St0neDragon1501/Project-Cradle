@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" P ", "AIA", " P "],
+  "key": {
+    "P": "minecraft:prismarine_crystals",
+    "A": "minecraft:amethyst_shard",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {"id": "project_cradle:forger_technique"}
+}

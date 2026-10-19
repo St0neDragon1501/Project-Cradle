@@ -17,6 +17,14 @@ public final class ModMenus {
             MENUS.register("quick_drop",
                     () -> new MenuType<>(QuickDropMenu::new, FeatureFlags.DEFAULT_FLAGS));
 
+    public static final Supplier<MenuType<TechniqueWheelMenu>> TECHNIQUE_WHEEL =
+            MENUS.register("technique_wheel",
+                    () -> new MenuType<>(TechniqueWheelMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
+    public static final Supplier<MenuType<SoulspaceMenu>> SOULSPACE =
+            MENUS.register("soulspace",
+                    () -> new MenuType<>(SoulspaceMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
     private ModMenus() {
     }
 

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" G ", "ADA", " B "],
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "A": "minecraft:amethyst_shard",
+    "D": "minecraft:diamond",
+    "B": "minecraft:book"
+  },
+  "result": {"id": "project_cradle:foundation_cycling_technique"}
+}

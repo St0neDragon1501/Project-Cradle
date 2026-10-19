@@ -1,0 +1,1 @@
+{"parent":"project_cradle:unlock_madra","display":{"icon":{"id":"minecraft:dragon_egg"},"title":{"translate":"advancements.project_cradle.reach_monarch.title"},"description":{"translate":"advancements.project_cradle.reach_monarch.description"},"frame":"challenge","show_toast":true,"announce_to_chat":true},"criteria":{"reached":{"trigger":"minecraft:impossible"}}}

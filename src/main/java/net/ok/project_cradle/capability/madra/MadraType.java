@@ -19,14 +19,14 @@ public class MadraType implements ValueIOSerializable {
             MadraType::new
     );
 
-    private Element first = Element.FIRE;
+    private Element first = Element.PURE;
     private Element second;
 
     public MadraType() {
     }
 
     private MadraType(int firstOrdinal, int secondOrdinal) {
-        this.first = Element.fromOrdinal(firstOrdinal, Element.FIRE);
+        this.first = Element.fromOrdinal(firstOrdinal, Element.PURE);
         Element decodedSecond = Element.fromOrdinal(secondOrdinal, null);
         this.second = decodedSecond == this.first ? null : decodedSecond;
     }
@@ -115,7 +115,7 @@ public class MadraType implements ValueIOSerializable {
 
     @Override
     public void deserialize(ValueInput input) {
-        this.first = Element.fromId(input.read("first", Codec.STRING).orElse(Element.FIRE.id), Element.FIRE);
+        this.first = Element.fromId(input.read("first", Codec.STRING).orElse(Element.PURE.id), Element.PURE);
         Element decodedSecond = Element.fromId(input.read("second", Codec.STRING).orElse(""), null);
         this.second = decodedSecond == this.first ? null : decodedSecond;
     }
@@ -124,7 +124,18 @@ public class MadraType implements ValueIOSerializable {
         FIRE("fire"),
         WATER("water"),
         AIR("air"),
-        EARTH("earth");
+        EARTH("earth"),
+        PURE("pure"),
+        LIFE("life"),
+        DEATH("death"),
+        LIGHT("light"),
+        SHADOW("shadow"),
+        BLOOD("blood"),
+        DREAM("dream"),
+        DESTRUCTION("destruction"),
+        FORCE("force"),
+        SWORD("sword"),
+        HUNGER("hunger");
 
         private final String id;
 
@@ -132,12 +143,20 @@ public class MadraType implements ValueIOSerializable {
             this.id = id;
         }
 
+        public String id() {
+            return this.id;
+        }
+
         public String translationKey() {
             return "madra_type.project_cradle." + this.id;
         }
 
         public static Element byOrdinal(int ordinal) {
-            return fromOrdinal(ordinal, FIRE);
+            return fromOrdinal(ordinal, PURE);
+        }
+
+        public static Element byId(String id) {
+            return fromId(id, null);
         }
 
         private static Element fromId(String id, Element fallback) {

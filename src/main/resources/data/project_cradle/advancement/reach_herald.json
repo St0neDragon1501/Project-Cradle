@@ -1,0 +1,1 @@
+{"parent":"project_cradle:reach_archlord","display":{"icon":{"id":"minecraft:totem_of_undying"},"title":{"translate":"advancements.project_cradle.reach_herald.title"},"description":{"translate":"advancements.project_cradle.reach_herald.description"},"frame":"goal","show_toast":true,"announce_to_chat":true},"criteria":{"reached":{"trigger":"minecraft:impossible"}}}

@@ -24,13 +24,27 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<Core>> CORE =
             ATTACHMENT_TYPES.register(
                     "core",
-                    () -> AttachmentType.serializable(Core::new).build()
+                    () -> AttachmentType.serializable(Core::new)
+                            .sync(Core.STREAM_CODEC)
+                            .build()
             );
 
     public static final Supplier<AttachmentType<QuickDropInventory>> QUICK_DROP_INVENTORY =
             ATTACHMENT_TYPES.register(
                     "quick_drop_inventory",
                     () -> AttachmentType.serializable(QuickDropInventory::new).build()
+            );
+
+    public static final Supplier<AttachmentType<SoulspaceInventory>> SOULSPACE_INVENTORY =
+            ATTACHMENT_TYPES.register(
+                    "soulspace_inventory",
+                    () -> AttachmentType.serializable(SoulspaceInventory::new).build()
+            );
+
+    public static final Supplier<AttachmentType<SacredBeastAge>> SACRED_BEAST_AGE =
+            ATTACHMENT_TYPES.register(
+                    "sacred_beast_age",
+                    () -> AttachmentType.serializable(SacredBeastAge::new).build()
             );
     
     
