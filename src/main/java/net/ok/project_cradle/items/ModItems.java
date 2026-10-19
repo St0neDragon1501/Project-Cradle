@@ -10,6 +10,8 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
+import net.ok.project_cradle.entities.ModEntities;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -18,6 +20,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.spells.PathTechnique;
+import net.ok.project_cradle.spells.AdditionalTechnique;
 import net.ok.project_cradle.capability.core.IronBodyType;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
@@ -25,6 +28,9 @@ import net.minecraft.world.item.Items;
 
 public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ProjectCradle.MODID);
+
+    public static final DeferredItem<Item> REMNANT_SPAWN_EGG = ITEMS.registerItem("remnant_spawn_egg",
+            properties -> new SpawnEggItem(properties.spawnEgg(ModEntities.REMNANT.get())));
 
     public static final DeferredItem<Item> SOUL_CRUSHER = ITEMS.registerItem("soul_crusher",
             properties -> new SoulCrusherItem(properties.stacksTo(1)));
@@ -43,6 +49,11 @@ public class ModItems {
 
     public static final List<DeferredItem<Item>> PATH_TECHNIQUES = Arrays.stream(PathTechnique.values())
             .map(ModItems::registerTechnique)
+            .toList();
+
+    public static final List<DeferredItem<Item>> ADDITIONAL_TECHNIQUES = Arrays.stream(AdditionalTechnique.values())
+            .map(technique -> ITEMS.<Item>registerItem(technique.id(),
+                    properties -> new AdditionalTechniqueItem(properties.stacksTo(1), technique)))
             .toList();
 
     public static final DeferredItem<Item> FORGER_TECHNIQUE = ITEMS.registerItem("forger_technique",

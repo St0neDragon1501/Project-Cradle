@@ -61,13 +61,40 @@ Automatic appearance follows your current madra types, including compound aspect
 | Life, Blood, Shadow, or Hunger | A coiled serpent around the left arm | Sandviper |
 | Air | Jade wings that gently move with the player | Naru |
 | Fire + Destruction, or Fire, Destruction, or Death | Black eyes with glowing red irises | Blackflame |
-| Air + Force, or Dream | Three floating swords and small clouds behind the shoulders | Cloud Hammer |
+| Air + Force | Three floating swords and small clouds behind the shoulders | Cloud Hammer |
+| Dream, including Fire + Dream | A curved ivory fox tail with a white tip and gentle sway | White Fox |
 
-Compound combinations take priority over single-aspect defaults. Use `/cradle goldsign auto` to follow your madra or choose a Path appearance with `/cradle goldsign jai`, `cassias`, `fisher`, `sandviper`, `naru`, `blackflame`, or `cloud_hammer`. The descriptive style IDs are also accepted and appear in command suggestions. Changing the style requires an existing Goldsign and changes no combat bonuses. Natural Gold artists do not gain a sign through this command.
+Compound combinations take priority over single-aspect defaults. Use `/cradle goldsign auto` to follow your madra or choose a Path appearance with `/cradle goldsign jai`, `cassias`, `fisher`, `sandviper`, `naru`, `blackflame`, `cloud_hammer`, or `fox_tail`. The descriptive style IDs are also accepted and appear in command suggestions. Changing the style requires an existing Goldsign and changes no combat bonuses. Natural Gold artists do not gain a sign through this command.
 
-Hair and eyes follow the head; hands, bracers, and serpents follow their arms; wings and floating swords follow the torso. Classic and slim skins use separate meshes. Arm features also appear when Minecraft renders that arm in first person. Head and back signs are visible in third person and the inventory preview. These are cosmetic wings and swords; they do not grant flight or weapon attacks.
+Hair and eyes follow the head; hands, bracers, and serpents follow their arms; wings, floating swords, and the fox tail follow the torso. Classic and slim skins use separate meshes. Arm features also appear when Minecraft renders that arm in first person. Head and back signs are visible in third person and the inventory preview. These are cosmetic wings and swords; they do not grant flight or weapon attacks.
 
-Remnants, sacred beasts, wild spirits, and sacred herbs provide world encounters and progression resources; their Minecraft forms and spawn rules are adaptations.
+Remnants, sacred beasts, wild spirits, and sacred herbs provide world encounters and progression resources. Remnants use a custom spirit model; the other encounters retain their existing Minecraft adaptations.
+
+## Remnants
+
+A **Remnant** is now a registered custom spirit mob (`project_cradle:remnant`), with its own appearance. It floats and phases through obstacles, charges at enemies, and has a translucent body wrapped around a bright madra core. Glowing channels, eyes, wispy ribbons, and a few drifting motes show its spirit nature. Its colors retain one or two madra aspects; stronger ranks make a slightly denser, larger spirit.
+
+- **Humanoid:** a mask-like face, floating torso, spectral hands, and a trailing lower body.
+- **Beast:** a horned, muzzled spirit retaining the outline of sacred wildlife.
+- **Tree:** a branching spirit with a luminous trunk and crown, available for placing sacred-tree Remnants in worlds.
+
+Developed spirits leave a Remnant on death from **Iron onward**. Sacred beasts also qualify, including beasts from older saves that predate saved ranks. The Remnant inherits its source's rank, aspects, and broad shape; its health and attack strength are a bounded fraction of the living source's strength. Melee contact has short aspect effects such as Fire burns, Water chills, or Force knockback. These are instinctive echoes, not resurrected people or copies of their equipment.
+
+Existing spirits cannot leave another Remnant. Wild spirits, Dreadbeasts, Dreadgods, and entities with a destroyed spirit are excluded. Entities tagged `project_cradle.dreadbeast` or `project_cradle.spirit_destroyed` are explicitly excluded; the latter also supports a persistent boolean of the same name. These markers support future encounters and world configuration. Ordinary flowers, logs, and animals do not automatically become sacred spirits.
+
+Defeating an ordinary Remnant drops a **Remnant Binding** retaining its primary aspect for the existing compatible Jade-to-Lowgold route. Personal Remnants manifested with a **Spirit Mirror** use this custom mob too, with the existing Archlord requirements, owner-linked challenge, and time limit. They grant fusion through that challenge rather than ordinary loot or experience, and cannot be diverted by Fox Dream. Previously saved Vex-based Remnants remain compatible with their original binding drops and challenge tracking; new formations use the custom entity.
+
+The **Remnant Spawn Egg** is in the Project Cradle creative tab. Operators can also place spirits with:
+
+```text
+/summon project_cradle:remnant
+/cradle remnant spawn <primary> [rank] [humanoid|beast|tree] [secondary]
+/cradle remnant spawn fire iron beast
+/cradle remnant spawn life lowgold tree
+/cradle remnant spawn light monarch humanoid air
+```
+
+The egg and plain summon default to an Iron spirit with Pure madra. The Cradle command supports all existing aspects and Iron through Monarch; its optional arguments follow the order shown. World spawning, attacks, progression, and drops are controlled by the server. The tree form is available for world building; ordinary tree blocks do not represent a developed sacred plant.
 
 ## Soulspace, soulfire, and the Lord Realm
 
@@ -117,7 +144,7 @@ Complete **both Sage and Herald at Archlord** to become a Monarch. A Sage who ma
 | Fire | Offensive technique hits ignite targets for four seconds. Projectiles can also ignite a suitable block surface. |
 | Water | Breathe underwater without consuming air. |
 | Earth | Mine blocks 20% faster, similar to Haste I. |
-| Air | Press H to take off and fly in a swimming pose. WASD moves level, Space rises, Shift descends, and holding sprint boosts speed. |
+| Air | Press H to take off in upright, creative-style flight. WASD moves level, Space rises, Shift descends, and holding sprint boosts speed. |
 | Pure | No additional passive. |
 | Life | Regeneration I while eligible, without replacing stronger regeneration. |
 | Death | Add 1 damage to damaging techniques before defenses. |
@@ -135,6 +162,8 @@ These are additional passives: individual techniques retain their own aspect eff
 ### Air flight
 
 At Lowgold with Air madra, or as a Monarch, press **H** to take off directly from the ground. Flight is available while awake, unmounted, outside water and lava, and not gliding with an elytra.
+
+Air flight keeps the player upright, with movement similar to creative flight.
 
 - **WASD** moves horizontally in the direction you face. Looking up or down does not change your altitude.
 - **Space** rises and **Shift** descends.
@@ -155,7 +184,47 @@ The **Project Cradle** creative tab contains progression items, resources, aspec
 - **Starlight:** Star Lance, Flowing Starlight, Star's Edge, Serpent's Shadow, Forged Needles.
 - **Additional techniques:** Oathsign, Stone Anchor, Cutting Wind, Grasping Sky, Wind Pressure, Forged Wings.
 
-**Basic Striker** spends madra, changes its appearance and effects with the user's aspect, and disperses after five blocks. The general **Forger** creates a brief protective shell for 18 madra; **Enforcer** reinforces the body for 22 madra; **Ruler** requires Jade and commands a nearby damaging aura wave for 26 madra.
+**Basic Striker** spends madra, changes its appearance and effects with the user's aspect, and disperses after a base distance of five blocks, increasing with core refinement and rank. The general **Forger** creates a brief protective shell for 18 base madra; **Enforcer** reinforces the body for 22 base madra; **Ruler** requires Jade and commands a nearby damaging aura wave for 26 base madra.
+
+### Fox Dream charm
+
+**Fox Dream** now prepares an on-hit charm instead of applying blindness, slowness, and nausea in a cone. Cast it normally from your hand or an unlocked technique slot, then attack hostile mobs while the charm window is active. Melee hits and player-owned projectile/technique hits can trigger it.
+
+- Base activation: **22 madra**, a one-second cast, and a five-second cooldown.
+- Base charm window: **12 seconds**. Each successful charm lasts up to **10 seconds**.
+- The attacked mob must survive, have its AI enabled, and have another hostile it can fight within **8 blocks**. Players, pets, passive creatures, and already-charmed mobs are excluded as targets; bosses and Wardens cannot be charmed.
+- Each successful charm spends **4 additional base madra**. No extra payment is taken if you lack madra, no eligible enemy is nearby, or the victim is already charmed.
+- The charmed mob fights nearby hostiles and cannot damage players, pets, or passive creatures while charmed. Hearts mark the charm. It ends when its duration expires, no eligible enemy remains nearby, or the caster dies, disconnects, or changes dimension. Unloading the mob also ends its charm; no taming or permanent AI changes are saved.
+- Durations, enemy search distance, activation cost, and extra charm cost use the same advancement/refinement scaling as other techniques. Item tooltips show your current durations and costs. Existing Dream Gold passives still apply independently to techniques.
+
+Dream Goldsigns automatically use the new fox tail. Existing Goldsign holders can choose it with `/cradle goldsign fox_tail` (aliases: `fox`, `tail`, `white_fox`); `/cradle goldsign auto` returns to aspect selection. It uses no equipment slot and stays visible with armor.
+
+### Eight general spells
+
+These reusable technique items can be crafted or found in the Project Cradle creative tab. Cast them from your hand or an unlocked technique slot. Their aspect describes the spell itself; your current core still determines your Gold passives.
+
+| Spell | Base madra | Cast time | Cooldown | Effect |
+| --- | --- | --- | --- | --- |
+| Shield | 30 | Instant | 8 s | Place a physical barrier ahead of you. It blocks projectiles and absorbs attacks until its health runs out or it expires. Recasting replaces your previous shield. |
+| Fireball | 28 | 1.2 s | 3 s | Launch a growing orb that explodes on impact, burning nearby foes. Its impact power and blast area grow during travel. |
+| Ice Lance | 18 | 0.6 s | 2 s | Fire a fast ice bolt that pierces up to four creatures and slows those it damages. |
+| Chain Lightning | 32 | 1 s | 5 s | Strike a visible foe near your crosshair, then chain through up to four nearby foes. Each jump requires a clear line of sight. |
+| Blink | 20 | Instant | 4 s | Move along your aim toward a nearby clear space. Collision checks keep your whole body in front of obstructions. |
+| Healing Pulse | 25 | 1 s | 7 s | Restore health to yourself and nearby allied players. Healing stops at each target's maximum health. |
+| Counterspell | 20 | Instant | 4 s | Cancel hostile projectiles and interrupt enemies preparing techniques in a cone ahead of you. |
+| Gravity Well | 35 | 1.2 s | 8 s | Place a five-second vortex at your aim point. It pulls nearby foes inward and deals periodic technique damage. |
+
+Recipes use a book and amethyst shards with ingredients suited to the spell: iron/prismarine for Shield, fire charge/blaze powder for Fireball, snow/prismarine for Ice Lance, copper/blaze rod for Chain Lightning, ender pearls/obsidian for Blink, ghast tear/glistering melon for Healing Pulse, lapis/quartz for Counterspell, and echo shard/obsidian for Gravity Well. Technique items are reusable; casting consumes madra.
+
+### Casting and progression
+
+Timed techniques display a cast bar above the hotbar and a ring of runes during preparation. You can prepare one technique at a time. **J cancels the current cast**. Taking an enemy hit of at least two hearts, changing or moving the source item, opening a container, sleeping, changing dimensions, or disconnecting also interrupts preparation.
+
+Madra and cooldowns are applied when the technique successfully completes. An interrupted cast spends no madra. A failed effect, such as a blocked Blink, a Healing Pulse with nobody injured, or a Counterspell with nothing to cancel, refunds its payment and does not start its cooldown. Item tooltips show each technique's effect, current madra cost for your level, cast time, and cooldown. Without a player context (such as search indexing), the tooltip labels its cost as a base cost.
+
+Advancement increases supported technique damage, range, duration, and enforcement strength. Growing your core capacity toward the next rank also adds **refinement**, so training within a rank improves your techniques. Sage and Herald accomplishments add power. Individual techniques retain their targeting, collision, and range limits; Basic Striker still disperses after a base distance of five blocks, increasing with core refinement and rank. The table above lists base costs and timings.
+
+Refinement runs from 0–100% between the current rank’s starting capacity and the next rank’s capacity threshold. Each completed rank or full refinement interval adds 18% of base technique damage and madra cost, 8% of base reach, and 5% of base duration. Sage and Herald each add another 10% of base power and madra cost. Costs are rounded to two decimal places, and the same current cost is used for tooltips, preparation checks, payment, and refunds. Enforcer techniques also gain temporary attack damage, movement speed, and armor continuously with this power; repeated casting refreshes the bonus without stacking it. Shield durability and Healing Pulse recovery scale with power. This is a mod balance rule, not a book statistic.
 
 Supported madra aspects are Pure, Fire, Water, Air, Earth, Life, Death, Light, Shadow, Blood, Dream, Destruction, Force, Sword, and Hunger. A core stores one or two aspects.
 
@@ -172,6 +241,7 @@ All default bindings appear under **Project Cradle** in Minecraft's Controls men
 | R | Open the technique wheel, showing quick slots 1–4. |
 | 1–4 inside the wheel | Select the corresponding technique; clicking a slot also selects it. |
 | G | Cast the selected technique. |
+| J | Cancel the technique currently being prepared. |
 | H | Toggle Air flight: take off, resume flight, or begin a gentle landing. |
 | WASD while flying | Move horizontally using the direction you face. |
 | Space / Shift while flying | Rise / descend. |
@@ -206,7 +276,7 @@ Use lowercase aspect IDs such as `fire`, `water`, `pure`, or `destruction`. Chan
 
 Use a **Java 25** runtime and the included Gradle wrapper. Standard NeoForge tasks include `runClient` and `build`.
 
-The network protocol is **4**. Use matching mod versions on the client and server.
+The network protocol is **5**. Use matching mod versions on the client and server.
 
 Gameplay rules live under `net.ok.project_cradle.server`: progression, Iron body benefits, Remnant fusion, contracts, Icon authority, aura sampling, spell effects and costs, item actions, commands, world/player events, and incoming action handlers. These APIs use `ServerPlayer` or `ServerLevel`; the same gameplay logic runs in singleplayer and on a dedicated server. The server validates requests, changes inventories, spends madra, applies effects and damage, and synchronizes results.
 
