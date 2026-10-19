@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:glass_pane",
+    "minecraft:amethyst_shard",
+    "minecraft:ender_pearl",
+    "minecraft:iron_ingot"
+  ],
+  "result": {
+    "id": "project_cradle:spirit_mirror",
+    "count": 1
+  }
+}

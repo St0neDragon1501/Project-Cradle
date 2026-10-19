@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "project_cradle:iron_body_elixir",
+    "minecraft:iron_block",
+    "minecraft:netherite_scrap"
+  ],
+  "result": {
+    "id": "project_cradle:steelforged_iron_body_elixir",
+    "count": 1
+  }
+}

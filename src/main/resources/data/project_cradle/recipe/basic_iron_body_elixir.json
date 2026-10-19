@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "minecraft:apple",
+    "minecraft:iron_ingot"
+  ],
+  "result": {
+    "id": "project_cradle:basic_iron_body_elixir",
+    "count": 1
+  }
+}

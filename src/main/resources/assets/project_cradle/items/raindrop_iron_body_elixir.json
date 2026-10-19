@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/raindrop_iron_body_elixir",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -10238754
+      }
+    ]
+  }
+}

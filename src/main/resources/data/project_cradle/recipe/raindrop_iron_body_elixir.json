@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "project_cradle:iron_body_elixir",
+    "minecraft:rabbit_foot",
+    "minecraft:feather"
+  ],
+  "result": {
+    "id": "project_cradle:raindrop_iron_body_elixir",
+    "count": 1
+  }
+}

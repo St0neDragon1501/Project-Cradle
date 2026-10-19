@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/steelforged_iron_body_elixir",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -7231820
+      }
+    ]
+  }
+}

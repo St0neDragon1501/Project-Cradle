@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "project_cradle:iron_body_elixir",
+    "minecraft:string",
+    "minecraft:slime_ball"
+  ],
+  "result": {
+    "id": "project_cradle:puppeteer_iron_body_elixir",
+    "count": 1
+  }
+}

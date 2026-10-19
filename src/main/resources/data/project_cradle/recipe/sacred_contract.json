@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:lead",
+    "minecraft:amethyst_shard",
+    "minecraft:gold_ingot"
+  ],
+  "result": {
+    "id": "project_cradle:sacred_contract",
+    "count": 1
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "project_cradle:iron_body_elixir",
+    "minecraft:spider_eye",
+    "minecraft:ghast_tear"
+  ],
+  "result": {
+    "id": "project_cradle:bloodforged_iron_body_elixir",
+    "count": 1
+  }
+}
