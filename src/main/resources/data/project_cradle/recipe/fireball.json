@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "ABA",
+    " F "
+  ],
+  "key": {
+    "P": "minecraft:blaze_powder",
+    "A": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "F": "minecraft:fire_charge"
+  },
+  "result": {
+    "id": "project_cradle:fireball",
+    "count": 1
+  }
+}

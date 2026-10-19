@@ -123,6 +123,14 @@ public final class GoldsignArmorLayer extends RenderLayer<AvatarRenderState, Pla
                 poses.translate(0.0F, breath * 0.035F, 0.0F);
                 poses.mulPose(Axis.ZP.rotation((float) Math.sin(age * 0.045F) * 0.025F));
             }
+            case FOX_TAIL -> {
+                // All fur layers sway about the same lower-back root, in model units / 16.
+                poses.translate(0.0F, 10.2F / 16.0F, 3.0F / 16.0F);
+                poses.mulPose(Axis.YP.rotation((float) Math.sin(age * 0.065F) * 0.11F
+                        + (float) Math.sin(age * 0.027F) * 0.045F));
+                poses.mulPose(Axis.XP.rotation((float) Math.sin(age * 0.045F) * 0.025F));
+                poses.translate(0.0F, -10.2F / 16.0F, -3.0F / 16.0F);
+            }
             case NONE -> { }
         }
     }

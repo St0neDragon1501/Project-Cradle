@@ -8,6 +8,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.networking.packet.CycleC2S;
+import net.ok.project_cradle.networking.packet.CancelCastC2S;
 import net.ok.project_cradle.networking.packet.ToggleAirFlightC2S;
 import net.ok.project_cradle.networking.packet.QuickDropKeyC2S;
 
@@ -27,6 +28,10 @@ public final class ClientInputHandler {
             if (noScreenOpen && Minecraft.getInstance().player != null) {
                 ClientPacketDistributor.sendToServer(new ToggleAirFlightC2S());
             }
+        }
+
+        while (ModKeyMappings.CANCEL_CAST.consumeClick()) {
+            if (noScreenOpen && Minecraft.getInstance().player != null) ClientPacketDistributor.sendToServer(new CancelCastC2S());
         }
 
         if (noScreenOpen) {

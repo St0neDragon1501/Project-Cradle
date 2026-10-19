@@ -8,12 +8,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.item.ItemStack;
 import net.ok.project_cradle.capability.ModAttachments;
-import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.core.advancement.AdvancementLevel;
 import net.ok.project_cradle.capability.madra.Madra;
 import net.ok.project_cradle.capability.madra.MadraType;
 import net.ok.project_cradle.capability.madra.MaxMadra;
 import net.ok.project_cradle.entities.BasicStrikerProjectile;
+import net.ok.project_cradle.spells.TechniqueScaling;
 
 public final class BasicStrikerSpell {
     public static final double MADRA_COST = 10.0;
@@ -35,30 +35,24 @@ public final class BasicStrikerSpell {
             return false;
         }
 
+        double madraCost = TechniqueScaling.madraCost(player, MADRA_COST);
         Madra madra = player.getData(ModAttachments.MADRA);
-        if (!madra.trySpendMadra(MADRA_COST)) {
+        if (!madra.trySpendMadra(madraCost)) {
             player.sendSystemMessage(
-                    Component.translatable("message.project_cradle.not_enough_madra", MADRA_COST)
+                    Component.translatable("message.project_cradle.not_enough_madra", madraCost)
             );
             return false;
         }
 
         BasicStrikerProjectile projectile = new BasicStrikerProjectile(serverLevel, player, itemStack);
-        Core core = player.getData(ModAttachments.CORE);
         MadraType madraType = player.getData(ModAttachments.MADRA_TYPE);
         projectile.setMadraElement(madraType.getTypes().get(0));
-        float damage = 6.0F + (float) core.getAdvancement().order() * 0.75F;
-        if (core.hasSage()) {
-            damage += 3.0F;
-        }
-        if (core.hasHerald()) {
-            damage += 3.0F;
-        }
-        projectile.setSpellDamage(damage);
+        projectile.setSpellDamage(6.0F);
+        projectile.setMaxTravelDistance(TechniqueScaling.range(player, 5.0));
         projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, PROJECTILE_SPEED, 0.0F);
         if (!serverLevel.addFreshEntity(projectile)) {
             MaxMadra maxMadra = player.getData(ModAttachments.MAXMADRA);
-            madra.addMadra(MADRA_COST, maxMadra.getLevel());
+            madra.addMadra(madraCost, maxMadra.getLevel());
             player.syncData(ModAttachments.MADRA);
             return false;
         }

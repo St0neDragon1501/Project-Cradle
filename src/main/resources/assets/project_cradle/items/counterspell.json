@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/counterspell",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -4918017
+      }
+    ]
+  }
+}

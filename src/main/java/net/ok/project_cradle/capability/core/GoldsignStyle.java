@@ -13,7 +13,8 @@ public enum GoldsignStyle {
     ARM_SERPENT("arm_serpent"),
     WINGS("wings"),
     BLACKFLAME_EYES("blackflame_eyes"),
-    CLOUD_SWORDS("cloud_swords");
+    CLOUD_SWORDS("cloud_swords"),
+    FOX_TAIL("fox_tail");
 
     private final String id;
 
@@ -47,6 +48,7 @@ public enum GoldsignStyle {
             case "wings", "naru" -> WINGS;
             case "blackflame_eyes", "blackflame" -> BLACKFLAME_EYES;
             case "cloud_swords", "cloud_hammer" -> CLOUD_SWORDS;
+            case "fox_tail", "fox", "tail", "white_fox" -> FOX_TAIL;
             default -> null;
         };
     }
@@ -54,7 +56,7 @@ public enum GoldsignStyle {
     public static List<String> commandIds() {
         return List.of("auto", "metal_hair", "metal_bracer", "webbed_fingers", "arm_serpent", "wings",
                 "blackflame_eyes", "cloud_swords", "jai", "cassias", "fisher", "sandviper", "sandpiper",
-                "naru", "blackflame", "cloud_hammer");
+                "naru", "blackflame", "cloud_hammer", "fox_tail", "fox", "tail", "white_fox");
     }
 
     /** Resolve on the server so observers do not need access to another player's private madra types. */
@@ -71,6 +73,9 @@ public enum GoldsignStyle {
         if (aspects.contains(MadraType.Element.SWORD) && aspects.contains(MadraType.Element.LIGHT)) {
             return METAL_HAIR;
         }
+        if (aspects.contains(MadraType.Element.DREAM)) {
+            return FOX_TAIL;
+        }
         MadraType.Element primary = aspects.isEmpty() ? null : aspects.get(0);
         if (primary == null) primary = MadraType.Element.byId(core.getGoldsign());
         if (primary == null) return METAL_BRACER;
@@ -81,7 +86,7 @@ public enum GoldsignStyle {
             case LIGHT -> METAL_HAIR;
             case SWORD, EARTH, PURE -> METAL_BRACER;
             case FIRE, DESTRUCTION, DEATH -> BLACKFLAME_EYES;
-            case DREAM -> CLOUD_SWORDS;
+            case DREAM -> FOX_TAIL;
         };
     }
 }

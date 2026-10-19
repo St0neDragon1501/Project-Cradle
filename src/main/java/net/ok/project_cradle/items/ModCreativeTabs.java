@@ -27,6 +27,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.MADRA_TYPE_TUNER);
                         output.accept(ModItems.BASIC_STRIKER);
                         ModItems.PATH_TECHNIQUES.forEach(output::accept);
+                        ModItems.ADDITIONAL_TECHNIQUES.forEach(output::accept);
                         output.accept(ModItems.FORGER_TECHNIQUE);
                         output.accept(ModItems.ENFORCER_TECHNIQUE);
                         output.accept(ModItems.RULER_TECHNIQUE);
@@ -39,6 +40,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.SACRED_CONTRACT);
                         output.accept(ModItems.SPIRIT_MIRROR);
                         output.accept(ModItems.REMNANT_BINDING);
+                        output.accept(ModItems.REMNANT_SPAWN_EGG);
                         output.accept(ModItems.ICON_ECHO);
                         output.accept(ModItems.SOULFIRE_PHIAL);
                         output.accept(ModItems.SACRED_HERB);

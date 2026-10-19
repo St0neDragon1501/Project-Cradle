@@ -17,7 +17,8 @@ public final class ForgerSpell {
     }
 
     private static boolean apply(ServerLevel level, ServerPlayer player) {
-        player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 200, 1, false, true, true));
+        player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, net.ok.project_cradle.spells.TechniqueScaling.duration(player, 200),
+                Math.min(4, (int) net.ok.project_cradle.spells.TechniqueScaling.power(player)), false, true, true));
         MadraType.Element aspect = player.getData(ModAttachments.MADRA_TYPE).getTypes().get(0);
         TechniqueEffectUtil.emitAround(level, aspect, player, 32);
         return true;

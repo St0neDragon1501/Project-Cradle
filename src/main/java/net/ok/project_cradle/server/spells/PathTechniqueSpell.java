@@ -21,6 +21,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.spells.PathTechnique;
+import net.ok.project_cradle.spells.TechniqueScaling;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.core.advancement.AdvancementLevel;
 import net.ok.project_cradle.capability.madra.Madra;
@@ -51,26 +52,40 @@ public final class PathTechniqueSpell {
             return false;
         }
 
+        double madraCost = TechniqueScaling.madraCost(player, technique.madraCost());
         Madra madra = player.getData(ModAttachments.MADRA);
-        if (!madra.trySpendMadra(technique.madraCost())) {
+        if (!madra.trySpendMadra(madraCost)) {
             player.sendSystemMessage(Component.translatable(
-                    "message.project_cradle.not_enough_technique_madra", technique.madraCost()));
+                    "message.project_cradle.not_enough_technique_madra", madraCost));
             return false;
         }
         if (technique.soulfireCost() > 0.0 && !core.trySpendSoulfire(technique.soulfireCost())) {
-            madra.addMadra(technique.madraCost(), player.getData(ModAttachments.MAXMADRA).getLevel());
+            madra.addMadra(madraCost, player.getData(ModAttachments.MAXMADRA).getLevel());
             player.syncData(ModAttachments.MADRA);
             return false;
         }
 
         if (!perform(player, level, stack, technique)) {
-            madra.addMadra(technique.madraCost(), player.getData(ModAttachments.MAXMADRA).getLevel());
+            madra.addMadra(madraCost, player.getData(ModAttachments.MAXMADRA).getLevel());
             core.addSoulfire(technique.soulfireCost());
             player.syncData(ModAttachments.MADRA);
             player.syncData(ModAttachments.CORE);
             return false;
         }
 
+        int enforcementDuration = switch (technique) {
+            case BURNING_CLOAK -> 140;
+            case DRAGON_DESCENDS -> 50;
+            case FLOWING_SWORD -> 200;
+            case FLOWING_STARLIGHT -> 220;
+            case STARS_EDGE -> 180;
+            case SERPENTS_SHADOW -> 160;
+            case STONE_ANCHOR -> 180;
+            case GRASPING_SKY -> 220;
+            case FORGED_WINGS -> 220;
+            default -> 0;
+        };
+        if (enforcementDuration > 0) EnforcerPowerService.empower(player, enforcementDuration, technique.aspect());
         player.getCooldowns().addCooldown(stack, technique.cooldownTicks());
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 0.75F,
@@ -118,8 +133,8 @@ public final class PathTechniqueSpell {
     }
 
     private static boolean burningCloak(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.SPEED, 140, 1);
-        addEffect(player, MobEffects.STRENGTH, 140, 1);
+        addEffect(player, player, MobEffects.SPEED, 140, 1);
+        addEffect(player, player, MobEffects.STRENGTH, 140, 1);
         if (!player.getAbilities().instabuild) {
             player.hurt(player.damageSources().magic(), 1.0F);
         }
@@ -133,7 +148,7 @@ public final class PathTechniqueSpell {
         for (LivingEntity target : targets) {
             if (!TechniqueCombatService.hurt(player, player, target, 8.0F)) continue;
             target.igniteForSeconds(5.0F);
-            addEffect(target, MobEffects.WITHER, 80, 0);
+            addEffect(player, target, MobEffects.WITHER, 80, 0);
             pushAway(player, target, 0.45);
             emitAt(level, ParticleTypes.FLAME, target.position().add(0, target.getBbHeight() * 0.5, 0), 12, 0.35);
         }
@@ -143,12 +158,12 @@ public final class PathTechniqueSpell {
     }
 
     private static boolean dragonDescends(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.SPEED, 50, 1);
-        addEffect(player, MobEffects.STRENGTH, 50, 1);
+        addEffect(player, player, MobEffects.SPEED, 50, 1);
+        addEffect(player, player, MobEffects.STRENGTH, 50, 1);
         for (LivingEntity target : coneTargets(player, 5.0, 120.0)) {
             if (!TechniqueCombatService.hurt(player, player, target, 16.0F)) continue;
             target.igniteForSeconds(6.0F);
-            addEffect(target, MobEffects.WITHER, 100, 0);
+            addEffect(player, target, MobEffects.WITHER, 100, 0);
             pushAway(player, target, 1.4);
             emitAt(level, ParticleTypes.FLAME, target.position().add(0, target.getBbHeight() * 0.5, 0), 18, 0.35);
             emitAt(level, ParticleTypes.LARGE_SMOKE, target.position().add(0, target.getBbHeight() * 0.5, 0), 10, 0.25);
@@ -160,7 +175,7 @@ public final class PathTechniqueSpell {
 
     private static boolean finalSword(ServerPlayer player, ServerLevel level) {
         slash(player, level, 11.0, 14.0F, 100.0, 1.2);
-        addEffect(player, MobEffects.STRENGTH, 80, 0);
+        addEffect(player, player, MobEffects.STRENGTH, 80, 0);
         Vec3 arc = player.getEyePosition().add(player.getLookAngle().scale(3.0));
         emitAt(level, ParticleTypes.SWEEP_ATTACK, arc, 20, 1.0);
         emitAt(level, ParticleTypes.CRIT, arc, 16, 0.8);
@@ -172,7 +187,7 @@ public final class PathTechniqueSpell {
         Vec3 look = player.getLookAngle().normalize();
         Vec3 origin = player.position().add(0.0, player.getEyeHeight() * 0.65, 0.0);
         for (int i = 1; i <= 9; i++) {
-            double distance = i * 0.65;
+            double distance = TechniqueScaling.range(player, i * 0.65);
             Vec3 center = origin.add(look.scale(distance));
             emitAt(level, ParticleTypes.SOUL_FIRE_FLAME, center, 4, 0.22);
             emitAt(level, ParticleTypes.WITCH, center, 2, 0.18);
@@ -185,8 +200,8 @@ public final class PathTechniqueSpell {
         for (LivingEntity target : targets) {
             if (!TechniqueCombatService.onEffectHit(player, target)) continue;
             // The hidden status particles keep this mark from appearing as ordinary visible flames.
-            addEffect(target, MobEffects.POISON, 80, 0);
-            addEffect(target, MobEffects.WEAKNESS, 80, 0);
+            addEffect(player, target, MobEffects.POISON, 80, 0);
+            addEffect(player, target, MobEffects.WEAKNESS, 80, 0);
         }
         return true;
     }
@@ -194,34 +209,27 @@ public final class PathTechniqueSpell {
     private static boolean phantomLights(ServerPlayer player, ServerLevel level) {
         for (LivingEntity target : coneTargets(player, 10.0, 28.0)) {
             if (!TechniqueCombatService.onEffectHit(player, target)) continue;
-            addEffect(target, MobEffects.BLINDNESS, 50, 0);
+            addEffect(player, target, MobEffects.BLINDNESS, 50, 0);
             emitAt(level, ParticleTypes.END_ROD, target.position().add(0, target.getBbHeight(), 0), 10, 0.35);
         }
         return true;
     }
 
     private static boolean foxTail(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.SPEED, 160, 1);
-        addEffect(player, MobEffects.INVISIBILITY, 50, 0);
+        addEffect(player, player, MobEffects.SPEED, 160, 1);
+        addEffect(player, player, MobEffects.INVISIBILITY, 50, 0);
         emitHalo(level, player, ParticleTypes.CLOUD, 14, 0.8);
         return true;
     }
 
     private static boolean foxDream(ServerPlayer player, ServerLevel level) {
-        for (LivingEntity target : coneTargets(player, 9.0, 32.0)) {
-            if (!TechniqueCombatService.onEffectHit(player, target)) continue;
-            addEffect(target, MobEffects.BLINDNESS, 60, 0);
-            addEffect(target, MobEffects.SLOWNESS, 90, 1);
-            addEffect(target, MobEffects.NAUSEA, 90, 0);
-            emitAt(level, ParticleTypes.WITCH, target.position().add(0, target.getBbHeight() * 0.7, 0), 10, 0.3);
-        }
-        return true;
+        return FoxDreamCharmService.activate(player);
     }
 
     private static boolean foxMirror(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.INVISIBILITY, 100, 0);
-        addEffect(player, MobEffects.SPEED, 100, 0);
-        addEffect(player, MobEffects.RESISTANCE, 60, 0);
+        addEffect(player, player, MobEffects.INVISIBILITY, 100, 0);
+        addEffect(player, player, MobEffects.SPEED, 100, 0);
+        addEffect(player, player, MobEffects.RESISTANCE, 60, 0);
         for (int side : new int[] {-1, 1}) {
             Vec3 decoy = player.position().add(player.getLookAngle().z * side * 1.1, 0.3,
                     -player.getLookAngle().x * side * 1.1);
@@ -232,8 +240,8 @@ public final class PathTechniqueSpell {
     }
 
     private static boolean flowingSword(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.STRENGTH, 200, 0);
-        addEffect(player, MobEffects.SPEED, 120, 0);
+        addEffect(player, player, MobEffects.STRENGTH, 200, 0);
+        addEffect(player, player, MobEffects.SPEED, 120, 0);
         emitHalo(level, player, ParticleTypes.CRIT, 18, 0.8);
         return true;
     }
@@ -241,8 +249,8 @@ public final class PathTechniqueSpell {
     private static boolean venomMist(ServerPlayer player, ServerLevel level) {
         for (LivingEntity target : nearbyTargets(player, 6.0)) {
             if (!TechniqueCombatService.onEffectHit(player, target)) continue;
-            addEffect(target, MobEffects.POISON, 120, 0);
-            addEffect(target, MobEffects.SLOWNESS, 80, 0);
+            addEffect(player, target, MobEffects.POISON, 120, 0);
+            addEffect(player, target, MobEffects.SLOWNESS, 80, 0);
         }
         emitHalo(level, player, ParticleTypes.SPORE_BLOSSOM_AIR, 30, 2.2);
         emitHalo(level, player, ParticleTypes.WITCH, 18, 1.9);
@@ -250,32 +258,33 @@ public final class PathTechniqueSpell {
     }
 
     private static boolean flowingStarlight(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.SPEED, 220, 1);
-        addEffect(player, MobEffects.NIGHT_VISION, 260, 0);
-        addEffect(player, MobEffects.JUMP_BOOST, 160, 0);
+        addEffect(player, player, MobEffects.SPEED, 220, 1);
+        addEffect(player, player, MobEffects.NIGHT_VISION, 260, 0);
+        addEffect(player, player, MobEffects.JUMP_BOOST, 160, 0);
         emitHalo(level, player, ParticleTypes.END_ROD, 20, 0.9);
         return true;
     }
 
     private static boolean starsEdge(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.STRENGTH, 180, 1);
+        addEffect(player, player, MobEffects.STRENGTH, 180, 1);
         emitAt(level, ParticleTypes.END_ROD, player.getEyePosition().add(player.getLookAngle().scale(0.6)), 12, 0.2);
         return true;
     }
 
     private static boolean serpentsShadow(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.RESISTANCE, 160, 0);
-        addEffect(player, MobEffects.SLOW_FALLING, 120, 0);
+        addEffect(player, player, MobEffects.RESISTANCE, 160, 0);
+        addEffect(player, player, MobEffects.SLOW_FALLING, 120, 0);
         emitHalo(level, player, ParticleTypes.END_ROD, 12, 0.9);
         emitHalo(level, player, ParticleTypes.CRIT, 8, 0.75);
         return true;
     }
 
     private static boolean oathsign(ServerPlayer player, ServerLevel level) {
-        List<ServerPlayer> allies = level.getEntitiesOfClass(ServerPlayer.class, player.getBoundingBox().inflate(5.0));
+        List<ServerPlayer> allies = level.getEntitiesOfClass(ServerPlayer.class, player.getBoundingBox().inflate(TechniqueScaling.range(player, 5.0)));
         for (ServerPlayer ally : allies) {
-            addEffect(ally, MobEffects.RESISTANCE, 160, 0);
-            addEffect(ally, MobEffects.ABSORPTION, 160, 0);
+            if (ally != player && !player.isAlliedTo(ally)) continue;
+            addEffect(player, ally, MobEffects.RESISTANCE, 160, 0);
+            addEffect(player, ally, MobEffects.ABSORPTION, 160, 0);
             emitHalo(level, ally, ParticleTypes.END_ROD, 10, 0.65);
         }
         emitHalo(level, player, ParticleTypes.HAPPY_VILLAGER, 18, 1.3);
@@ -283,15 +292,15 @@ public final class PathTechniqueSpell {
     }
 
     private static boolean stoneAnchor(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.RESISTANCE, 180, 1);
-        addEffect(player, MobEffects.SLOWNESS, 180, 1);
+        addEffect(player, player, MobEffects.RESISTANCE, 180, 1);
+        addEffect(player, player, MobEffects.SLOWNESS, 180, 1);
         emitHalo(level, player, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()), 18, 0.9);
         return true;
     }
 
     private static boolean graspingSky(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.JUMP_BOOST, 220, 2);
-        addEffect(player, MobEffects.SLOW_FALLING, 260, 0);
+        addEffect(player, player, MobEffects.JUMP_BOOST, 220, 2);
+        addEffect(player, player, MobEffects.SLOW_FALLING, 260, 0);
         emitHalo(level, player, ParticleTypes.CLOUD, 18, 0.9);
         return true;
     }
@@ -299,8 +308,8 @@ public final class PathTechniqueSpell {
     private static boolean windPressure(ServerPlayer player, ServerLevel level) {
         for (LivingEntity target : nearbyTargets(player, 7.0)) {
             if (!TechniqueCombatService.onEffectHit(player, target)) continue;
-            addEffect(target, MobEffects.SLOWNESS, 100, 1);
-            addEffect(target, MobEffects.WEAKNESS, 100, 0);
+            addEffect(player, target, MobEffects.SLOWNESS, 100, 1);
+            addEffect(player, target, MobEffects.WEAKNESS, 100, 0);
             pushAway(player, target, 0.35);
         }
         emitHalo(level, player, ParticleTypes.GUST, 16, 1.5);
@@ -308,9 +317,9 @@ public final class PathTechniqueSpell {
     }
 
     private static boolean forgedWings(ServerPlayer player, ServerLevel level) {
-        addEffect(player, MobEffects.SLOW_FALLING, 400, 0);
-        addEffect(player, MobEffects.JUMP_BOOST, 220, 1);
-        addEffect(player, MobEffects.RESISTANCE, 100, 0);
+        addEffect(player, player, MobEffects.SLOW_FALLING, 400, 0);
+        addEffect(player, player, MobEffects.JUMP_BOOST, 220, 1);
+        addEffect(player, player, MobEffects.RESISTANCE, 100, 0);
         Vec3 left = player.position().add(-0.65, player.getBbHeight() * 0.65, 0.0);
         Vec3 right = player.position().add(0.65, player.getBbHeight() * 0.65, 0.0);
         emitAt(level, ParticleTypes.CLOUD, left, 16, 0.3);
@@ -362,7 +371,7 @@ public final class PathTechniqueSpell {
                 : new PathTechniqueProjectile(projectileType.get(), level, player, stack);
         projectile.setMadraElement(technique.aspect());
         projectile.setSpellDamage(damage);
-        projectile.setMaxTravelDistance(range);
+        projectile.setMaxTravelDistance(TechniqueScaling.range(player, range));
         projectile.setBurnOnHit(burnOnHit);
         projectile.setInvisible(invisible);
         projectile.shootFromRotation(player, player.getXRot(), player.getYRot() + yawOffset,
@@ -373,38 +382,40 @@ public final class PathTechniqueSpell {
     private static void applyAspectEffect(ServerPlayer owner, LivingEntity target, MadraType.Element aspect) {
         switch (aspect) {
             case FIRE -> target.igniteForSeconds(3.0F);
-            case WATER -> addEffect(target, MobEffects.SLOWNESS, 60, 0);
-            case EARTH -> addEffect(target, MobEffects.WEAKNESS, 60, 0);
-            case PURE -> addEffect(target, MobEffects.WEAKNESS, 60, 0);
+            case WATER -> addEffect(owner, target, MobEffects.SLOWNESS, 60, 0);
+            case EARTH -> addEffect(owner, target, MobEffects.WEAKNESS, 60, 0);
+            case PURE -> addEffect(owner, target, MobEffects.WEAKNESS, 60, 0);
             case LIFE -> owner.heal(1.0F);
-            case DEATH -> addEffect(target, MobEffects.WITHER, 60, 0);
-            case LIGHT -> addEffect(target, MobEffects.GLOWING, 100, 0);
-            case SHADOW -> addEffect(target, MobEffects.DARKNESS, 50, 0);
-            case BLOOD -> addEffect(target, MobEffects.POISON, 80, 0);
-            case DREAM -> addEffect(target, MobEffects.NAUSEA, 80, 0);
-            case HUNGER -> addEffect(target, MobEffects.HUNGER, 100, 0);
+            case DEATH -> addEffect(owner, target, MobEffects.WITHER, 60, 0);
+            case LIGHT -> addEffect(owner, target, MobEffects.GLOWING, 100, 0);
+            case SHADOW -> addEffect(owner, target, MobEffects.DARKNESS, 50, 0);
+            case BLOOD -> addEffect(owner, target, MobEffects.POISON, 80, 0);
+            case DREAM -> addEffect(owner, target, MobEffects.NAUSEA, 80, 0);
+            case HUNGER -> addEffect(owner, target, MobEffects.HUNGER, 100, 0);
             case AIR, DESTRUCTION, FORCE, SWORD -> { }
         }
     }
 
     private static List<LivingEntity> nearbyTargets(ServerPlayer player, double radius) {
+        radius = TechniqueScaling.range(player, radius);
         AABB bounds = player.getBoundingBox().inflate(radius);
         return player.level().getEntitiesOfClass(LivingEntity.class, bounds,
                 target -> target != player && target.isAlive() && player.hasLineOfSight(target));
     }
 
     private static List<LivingEntity> coneTargets(ServerPlayer player, double range, double arcDegrees) {
+        final double effectiveRange = TechniqueScaling.range(player, range);
         Vec3 look = player.getLookAngle().normalize();
         double minimumDot = Math.cos(Math.toRadians(arcDegrees / 2.0));
         return player.level().getEntitiesOfClass(LivingEntity.class,
-                player.getBoundingBox().inflate(range), target -> {
+                player.getBoundingBox().inflate(effectiveRange), target -> {
                     if (target == player || !target.isAlive() || !player.hasLineOfSight(target)) {
                         return false;
                     }
                     Vec3 toTarget = target.getBoundingBox().getCenter()
                             .subtract(player.getEyePosition());
                     double distance = toTarget.length();
-                    return distance <= range && distance > 0.0
+                    return distance <= effectiveRange && distance > 0.0
                             && look.dot(toTarget.scale(1.0 / distance)) >= minimumDot;
                 });
     }
@@ -415,8 +426,9 @@ public final class PathTechniqueSpell {
         target.hurtMarked = true;
     }
 
-    private static void addEffect(LivingEntity target,
+    private static void addEffect(ServerPlayer caster, LivingEntity target,
             net.minecraft.core.Holder<MobEffect> effect, int duration, int amplifier) {
+        duration = TechniqueScaling.duration(caster, duration);
         target.addEffect(new MobEffectInstance(effect, duration, amplifier, true, false, false));
     }
 

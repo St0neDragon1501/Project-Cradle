@@ -108,11 +108,6 @@ public class MadraHudOverlay {
         int statusX = event.getGuiGraphics().guiWidth() - minecraft.font.width(status) - 8;
         event.getGuiGraphics().text(minecraft.font, status, statusX, detailY, 0xFFFFFFFF, true);
         detailY += 12;
-        String hint = ProgressionHints.next(core).getString();
-        hint = minecraft.font.plainSubstrByWidth(hint, Math.max(80, event.getGuiGraphics().guiWidth() - 16));
-        event.getGuiGraphics().text(minecraft.font, Component.literal(hint),
-                event.getGuiGraphics().guiWidth() - minecraft.font.width(hint) - 8, detailY, 0xFFBFE9FF, true);
-        detailY += 12;
         if (core.getAdvancement().techniqueSlots() > 0) {
             Component selectedTechnique = Component.translatable(
                     "hud.project_cradle.selected_technique",

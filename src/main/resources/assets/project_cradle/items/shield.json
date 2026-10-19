@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/shield",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -7217936
+      }
+    ]
+  }
+}

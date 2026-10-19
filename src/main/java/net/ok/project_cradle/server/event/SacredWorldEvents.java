@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
@@ -24,6 +25,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
@@ -32,6 +34,9 @@ import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.ok.project_cradle.ProjectCradle;
+import net.ok.project_cradle.entities.ModEntities;
+import net.ok.project_cradle.entities.RemnantEntity;
+import net.ok.project_cradle.entities.RemnantForm;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.SacredBeastAge;
 import net.ok.project_cradle.capability.core.Core;
@@ -54,7 +59,7 @@ public final class SacredWorldEvents {
     private SacredWorldEvents() {
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDeath(LivingDeathEvent event) {
         if (!(event.getEntity().level() instanceof ServerLevel level)) {
             return;
@@ -65,30 +70,40 @@ public final class SacredWorldEvents {
             }
             return;
         }
-        // A Remnant comes from the deceased artist's spirit, regardless of the killer or location.
-        Core deceased = event.getEntity().getData(ModAttachments.CORE);
-        if (event.getEntity() instanceof Vex
-                || deceased.getAdvancement().order() < AdvancementLevel.IRON.order()
-                || level.getRandom().nextInt(4) != 0) {
+        // A developed, viable spirit leaves an echo; existing spirits cannot leave another one.
+        LivingEntity source = event.getEntity();
+        Core deceased = source.getData(ModAttachments.CORE);
+        boolean sacredBeast = source.getData(ModAttachments.SACRED_BEAST_AGE).isSacred();
+        if (source instanceof Vex || source instanceof RemnantEntity
+                || source.entityTags().contains(REMNANT_TAG)
+                || source.entityTags().contains(SpiritBondService.WILD_SPIRIT_TAG)
+                || source.entityTags().contains("project_cradle.dreadbeast")
+                || source.entityTags().contains("project_cradle.dreadgod")
+                || source.entityTags().contains("project_cradle.spirit_destroyed")
+                || source.getPersistentData().getBooleanOr("project_cradle.spirit_destroyed", false)
+                || source instanceof WitherBoss && source.getCustomName() != null
+                        && source.getCustomName().getString().equals("Dreadgod")
+                || !sacredBeast && deceased.getAdvancement().order() < AdvancementLevel.IRON.order()) {
             return;
         }
 
-        Vex remnant = EntityTypes.VEX.create(level, EntitySpawnReason.EVENT);
-        if (remnant == null) {
-            return;
+        RemnantEntity remnant = ModEntities.REMNANT.get().create(level, EntitySpawnReason.EVENT);
+        if (remnant == null) return;
+        remnant.inheritSpirit(source);
+        // Old sacred beasts predate saved advancement; they still have a developed spirit.
+        if (sacredBeast && deceased.getAdvancement().order() < AdvancementLevel.IRON.order()) {
+            remnant.setSpirit(AdvancementLevel.LOWGOLD, source.getData(ModAttachments.MADRA_TYPE).getTypes(), RemnantForm.BEAST);
         }
-        remnant.snapTo(event.getEntity().getX(), event.getEntity().getY() + 1.0,
-                event.getEntity().getZ(), event.getEntity().getYRot(), 0.0F);
-        remnant.setCustomName(Component.translatable("entity.project_cradle.remnant"));
-        remnant.setCustomNameVisible(true);
+        remnant.snapTo(source.getX(), source.getY() + 0.6, source.getZ(), source.getYRot(), 0.0F);
         remnant.setPersistenceRequired();
         remnant.addTag(REMNANT_TAG);
-        remnant.getData(ModAttachments.CORE).setAdvancement(deceased.getAdvancement());
-        remnant.getData(ModAttachments.MADRA_TYPE).copyFrom(event.getEntity().getData(ModAttachments.MADRA_TYPE));
-        if (event.getSource().getEntity() instanceof ServerPlayer killer) {
-            remnant.setTarget(killer);
+        if (source instanceof ServerPlayer || source.hasCustomName()) {
+            remnant.setCustomName(Component.translatable("entity.project_cradle.remnant_of", source.getName()));
+            remnant.setCustomNameVisible(true);
         }
-        level.addFreshEntity(remnant);
+        if (event.getSource().getEntity() instanceof LivingEntity attacker && attacker != source
+                && attacker.isAlive() && !attacker.isSpectator()) remnant.setTarget(attacker);
+        if (level.addFreshEntity(remnant)) remnant.spawnAnim();
     }
 
     @SubscribeEvent
@@ -101,7 +116,7 @@ public final class SacredWorldEvents {
         if (RemnantFusionService.isOwnRemnant(entity)) {
             return;
         }
-        boolean remnant = entity.entityTags().contains(REMNANT_TAG);
+        boolean remnant = entity instanceof RemnantEntity || entity.entityTags().contains(REMNANT_TAG);
         SacredBeastAge beastAge = entity.getData(ModAttachments.SACRED_BEAST_AGE);
         if (!remnant && !beastAge.isSacred()) {
             return;
@@ -259,6 +274,7 @@ public final class SacredWorldEvents {
         if (speed != null) {
             speed.setBaseValue(0.6 + 0.04 * (monarchs.size() - 1));
         }
+        dreadgod.addTag("project_cradle.dreadgod");
         dreadgod.setCustomName(Component.translatable("entity.project_cradle.dreadgod"));
         dreadgod.setCustomNameVisible(true);
         dreadgod.setPersistenceRequired();

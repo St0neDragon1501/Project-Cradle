@@ -18,10 +18,11 @@ public final class EnforcerSpell {
     }
 
     private static boolean apply(ServerLevel level, ServerPlayer player) {
-        player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 160, 0, false, true, true));
-        player.addEffect(new MobEffectInstance(MobEffects.SPEED, 160, 0, false, true, true));
-        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 0, false, true, true));
+        player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, net.ok.project_cradle.spells.TechniqueScaling.duration(player, 160), 0, false, true, true));
+        player.addEffect(new MobEffectInstance(MobEffects.SPEED, net.ok.project_cradle.spells.TechniqueScaling.duration(player, 160), 0, false, true, true));
+        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, net.ok.project_cradle.spells.TechniqueScaling.duration(player, 100), 0, false, true, true));
         MadraType.Element aspect = player.getData(ModAttachments.MADRA_TYPE).getTypes().get(0);
+        EnforcerPowerService.empower(player, 160, aspect);
         TechniqueEffectUtil.emitAround(level, aspect, player, 24);
         return true;
     }

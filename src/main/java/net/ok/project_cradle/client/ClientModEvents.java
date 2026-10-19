@@ -1,10 +1,11 @@
 package net.ok.project_cradle.client;
 
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import net.ok.project_cradle.networking.packet.CastingStateS2C;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.ok.project_cradle.ProjectCradle;
@@ -23,6 +24,7 @@ public final class ClientModEvents {
         event.register(ModKeyMappings.TECHNIQUE_WHEEL);
         event.register(ModKeyMappings.CAST_SELECTED_TECHNIQUE);
         event.register(ModKeyMappings.TOGGLE_AIR_FLIGHT);
+        event.register(ModKeyMappings.CANCEL_CAST);
         ModKeyMappings.QUICK_DROP_BINDINGS.forEach(event::register);
     }
 
@@ -34,12 +36,20 @@ public final class ClientModEvents {
     }
 
     @SubscribeEvent
+    public static void registerClientPayloads(RegisterClientPayloadHandlersEvent event) {
+        event.register(CastingStateS2C.TYPE, CastingStateHandler::handle);
+    }
+
+    @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(
                 ModEntities.BASIC_STRIKER_PROJECTILE.get(),
-                context -> new ThrownItemRenderer<>(context, 0.65F, true)
+                context -> new SpellProjectileRenderer<>(context)
         );
+        event.registerEntityRenderer(ModEntities.REMNANT.get(), RemnantRenderer::new);
+        event.registerEntityRenderer(ModEntities.MADRA_SHIELD.get(), MadraShieldRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPELL_BOLT.get(), context -> new SpellProjectileRenderer<>(context));
         ModEntities.PATH_PROJECTILES.values().forEach(projectile -> event.registerEntityRenderer(
-                projectile.get(), context -> new ThrownItemRenderer<>(context, 0.7F, true)));
+                projectile.get(), context -> new SpellProjectileRenderer<>(context)));
     }
 }

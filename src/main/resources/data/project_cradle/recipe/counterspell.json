@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " L ",
+    "ABA",
+    "QLQ"
+  ],
+  "key": {
+    "L": "minecraft:lapis_lazuli",
+    "A": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "Q": "minecraft:quartz"
+  },
+  "result": {
+    "id": "project_cradle:counterspell",
+    "count": 1
+  }
+}

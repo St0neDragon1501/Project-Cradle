@@ -9,6 +9,7 @@ import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.QuickDropInventory;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.items.TechniqueItem;
+import net.ok.project_cradle.server.spells.TechniqueCastingService;
 import net.ok.project_cradle.menus.QuickDropMenu;
 import net.ok.project_cradle.menus.TechniqueWheelMenu;
 import net.ok.project_cradle.networking.packet.QuickDropKeyC2S;
@@ -47,8 +48,9 @@ public final class QuickDropKeyPayloadHandler {
         }
 
         int techniqueSlots = Math.min(4, player.getData(ModAttachments.CORE).getAdvancement().techniqueSlots());
-        if (slotIndex < techniqueSlots && stack.getItem() instanceof TechniqueItem technique) {
-            technique.castTechnique(player, stack);
+        if (stack.getItem() instanceof TechniqueItem) {
+            if (slotIndex < techniqueSlots) TechniqueCastingService.begin(player, stack);
+            else player.sendSystemMessage(Component.translatable("message.project_cradle.technique_slot_locked"));
         } else {
             dropStack(player, slotIndex, stack);
         }
@@ -80,7 +82,7 @@ public final class QuickDropKeyPayloadHandler {
         if (stack.isEmpty()) {
             player.sendSystemMessage(Component.translatable("message.project_cradle.empty_technique_slot"));
         } else if (stack.getItem() instanceof TechniqueItem technique) {
-            technique.castTechnique(player, stack);
+            TechniqueCastingService.begin(player, stack);
         } else {
             player.sendSystemMessage(Component.translatable("message.project_cradle.item_not_technique"));
         }

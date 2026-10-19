@@ -26,6 +26,9 @@ public class ModKeyMappings {
     public static final KeyMapping TOGGLE_AIR_FLIGHT = new KeyMapping(
             "key.project_cradle.toggle_air_flight", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY
     );
+    public static final KeyMapping CANCEL_CAST = new KeyMapping(
+            "key.project_cradle.cancel_cast", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY
+    );
     public static final KeyMapping CAST_SELECTED_TECHNIQUE = new KeyMapping(
             "key.project_cradle.cast_selected_technique", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY
     );

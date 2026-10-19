@@ -8,12 +8,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Vex;
+import net.ok.project_cradle.entities.ModEntities;
+import net.ok.project_cradle.entities.RemnantEntity;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -71,10 +71,11 @@ public final class RemnantFusionService {
         }
         clearChallenge(player);
 
-        Vex remnant = EntityTypes.VEX.create(level, EntitySpawnReason.EVENT);
+        RemnantEntity remnant = ModEntities.REMNANT.get().create(level, EntitySpawnReason.EVENT);
         if (remnant == null) {
             return fail(player, "remnant_manifest_failed");
         }
+        remnant.inheritSpirit(player);
         long deadline = now + CHALLENGE_LIFETIME_TICKS;
         var position = player.position().add(player.getLookAngle().scale(3.0)).add(0.0, 0.5, 0.0);
         remnant.snapTo(position.x, position.y, position.z, player.getYRot() + 180.0F, 0.0F);
@@ -86,8 +87,6 @@ public final class RemnantFusionService {
         remnant.setPersistenceRequired();
         remnant.setLimitedLife(CHALLENGE_LIFETIME_TICKS);
         remnant.setTarget(player);
-        remnant.getData(ModAttachments.CORE).setAdvancement(core.getAdvancement());
-        remnant.getData(ModAttachments.MADRA_TYPE).copyFrom(player.getData(ModAttachments.MADRA_TYPE));
 
         double health = Math.max(40.0, player.getMaxHealth() * 1.5 + (core.hasSage() ? 20.0 : 0.0));
         AttributeInstance maxHealth = remnant.getAttribute(Attributes.MAX_HEALTH);
@@ -102,6 +101,7 @@ public final class RemnantFusionService {
         if (!level.addFreshEntity(remnant)) {
             return fail(player, "remnant_manifest_failed");
         }
+        remnant.spawnAnim();
         core.setOwnRemnantId(remnant.getUUID().toString());
         player.getPersistentData().putLong(DEADLINE_KEY, deadline);
         player.syncData(ModAttachments.CORE);

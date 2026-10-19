@@ -12,13 +12,14 @@ import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.core.advancement.AdvancementLevel;
 import net.ok.project_cradle.capability.madra.Madra;
 import net.ok.project_cradle.capability.madra.MaxMadra;
+import net.ok.project_cradle.spells.TechniqueScaling;
 
 /** Server-only payment, cooldown, and effect execution for general techniques. */
-final class MadraTechniqueSpell {
+public final class MadraTechniqueSpell {
     private MadraTechniqueSpell() {
     }
 
-    static boolean cast(ServerPlayer player, ItemStack stack, double madraCost, int cooldownTicks,
+    public static boolean cast(ServerPlayer player, ItemStack stack, double baseMadraCost, int cooldownTicks,
             BiPredicate<ServerLevel, ServerPlayer> effect) {
         ServerLevel level = player.level();
         if (player.getCooldowns().isOnCooldown(stack)) {
@@ -29,6 +30,7 @@ final class MadraTechniqueSpell {
             return false;
         }
 
+        double madraCost = TechniqueScaling.madraCost(player, baseMadraCost);
         Madra madra = player.getData(ModAttachments.MADRA);
         if (!madra.trySpendMadra(madraCost)) {
             player.sendSystemMessage(Component.translatable(

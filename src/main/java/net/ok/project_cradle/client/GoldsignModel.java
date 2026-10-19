@@ -15,7 +15,7 @@ import net.ok.project_cradle.capability.core.GoldsignStyle;
 /** Small, immutable cosmetic meshes. Animated attachment transforms belong to the render layer. */
 public final class GoldsignModel {
     public enum Anchor { HEAD, BODY, LEFT_ARM, RIGHT_ARM }
-    public enum Motion { NONE, LEFT_WING, RIGHT_WING, FLOATING }
+    public enum Motion { NONE, LEFT_WING, RIGHT_WING, FLOATING, FOX_TAIL }
     public record Piece(ModelPart part, Anchor anchor, int color, boolean emissive, Motion motion) { }
 
     private final Map<GoldsignStyle, List<Piece>> pieces = new EnumMap<>(GoldsignStyle.class);
@@ -47,6 +47,10 @@ public final class GoldsignModel {
         add(root, GoldsignStyle.CLOUD_SWORDS, "cloud_blade_edges", Anchor.BODY, 0xFFF1FBFF, true, Motion.FLOATING);
         add(root, GoldsignStyle.CLOUD_SWORDS, "cloud_hilts", Anchor.BODY, 0xFF738CAE, false, Motion.FLOATING);
         add(root, GoldsignStyle.CLOUD_SWORDS, "clouds", Anchor.BODY, 0xFFDDE9F0, false, Motion.FLOATING);
+        add(root, GoldsignStyle.FOX_TAIL, "fox_tail_shadow", Anchor.BODY, 0xFFD5BFB0, false, Motion.FOX_TAIL);
+        add(root, GoldsignStyle.FOX_TAIL, "fox_tail_fur", Anchor.BODY, 0xFFF1E5D8, false, Motion.FOX_TAIL);
+        add(root, GoldsignStyle.FOX_TAIL, "fox_tail_tip", Anchor.BODY, 0xFFFFFAF2, false, Motion.FOX_TAIL);
+        add(root, GoldsignStyle.FOX_TAIL, "fox_tail_tufts", Anchor.BODY, 0xFFFCF1E5, false, Motion.FOX_TAIL);
         this.pieces.replaceAll((style, list) -> List.copyOf(list));
     }
 
@@ -70,6 +74,7 @@ public final class GoldsignModel {
         wings(root);
         eyes(root);
         cloudSwords(root);
+        foxTail(root);
         return LayerDefinition.create(mesh, 16, 16);
     }
 
@@ -201,6 +206,48 @@ public final class GoldsignModel {
         part(root, "eye_iris", cubes()
                 .addBox(-2.25F, -4.15F, -4.12F, 0.65F, 0.95F, 0.10F)
                 .addBox(1.6F, -4.15F, -4.12F, 0.65F, 0.95F, 0.10F));
+    }
+
+    private static void foxTail(PartDefinition root) {
+        PartDefinition shadow = part(root, "fox_tail_shadow", cubes());
+        PartDefinition fur = part(root, "fox_tail_fur", cubes());
+        PartDefinition tip = part(root, "fox_tail_tip", cubes());
+        PartDefinition tufts = part(root, "fox_tail_tufts", cubes());
+        // Body-local coordinates: +Z is behind the artist and -Y curls the tail upward.
+        // The narrow root clears a chestplate; overlapping sections widen into a brush,
+        // then taper into a pale tip without touching the player's leg animation.
+        float[][] sections = {
+                {10.2F, 3.0F, 2.6F, 2.4F, 4.0F, 0.18F},
+                {9.5F, 6.2F, 4.3F, 4.1F, 4.7F, 0.25F},
+                {8.0F, 9.5F, 6.1F, 5.5F, 4.8F, 0.42F},
+                {6.0F, 12.7F, 5.7F, 5.2F, 4.3F, 0.62F},
+                {4.2F, 15.2F, 4.3F, 4.2F, 3.3F, 0.72F},
+                {2.6F, 17.0F, 2.6F, 2.8F, 2.5F, 0.76F}
+        };
+        for (int i = 0; i < sections.length; i++) {
+            float[] section = sections[i];
+            float width = section[2];
+            float height = section[3];
+            float length = section[4];
+            PartPose pose = PartPose.offsetAndRotation(0, section[0], section[1], section[5], 0, 0);
+            PartDefinition outer = i >= 4 ? tip : shadow;
+            outer.addOrReplaceChild("section_" + i, cubes()
+                    .addBox(-width / 2, -height / 2, 0, width, height, length), pose);
+            if (i < 4) {
+                fur.addOrReplaceChild("section_" + i, cubes()
+                        .addBox(-width / 2 - 0.04F, -height / 2 - 0.05F, -0.02F,
+                                width + 0.08F, height * 0.76F, length + 0.04F), pose);
+            }
+            if (i > 0 && i < 5) {
+                for (int side : new int[] {-1, 1}) {
+                    PartDefinition tuft = tufts.addOrReplaceChild("tuft_" + i + "_" + side, cubes(), pose);
+                    tuft.addOrReplaceChild("outer", cubes()
+                            .addBox(-0.55F, -0.65F, -0.35F, 1.1F, 1.3F, 2.4F),
+                            PartPose.offsetAndRotation(side * (width / 2 - 0.3F), -height * 0.13F,
+                                    length * 0.45F, 0.0F, side * 0.3F, side * -0.16F));
+                }
+            }
+        }
     }
 
     private static void cloudSwords(PartDefinition root) {

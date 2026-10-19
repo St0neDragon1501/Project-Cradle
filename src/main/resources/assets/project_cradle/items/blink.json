@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/blink",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -3757313
+      }
+    ]
+  }
+}

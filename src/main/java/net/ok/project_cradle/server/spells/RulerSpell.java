@@ -31,19 +31,13 @@ public final class RulerSpell {
         }
 
         List<Monster> targets = level.getEntitiesOfClass(Monster.class,
-                player.getBoundingBox().inflate(7.0), monster -> monster.isAlive());
+                player.getBoundingBox().inflate(net.ok.project_cradle.spells.TechniqueScaling.range(player, 7.0)), monster -> monster.isAlive());
         if (targets.isEmpty()) {
             player.sendSystemMessage(Component.translatable("message.project_cradle.ruler_no_targets"));
             return false;
         }
 
-        float damage = 4.0F + core.getAdvancement().order() * 0.65F;
-        if (core.hasSage()) {
-            damage += 2.0F;
-        }
-        if (core.hasHerald()) {
-            damage += 2.0F;
-        }
+        float damage = 5.0F;
         MadraType.Element aspect = player.getData(ModAttachments.MADRA_TYPE).getTypes().get(0);
         for (Monster target : targets) {
             if (!TechniqueCombatService.hurt(player, player, target, damage)) continue;

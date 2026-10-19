@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "ABA",
+    "OPO"
+  ],
+  "key": {
+    "P": "minecraft:ender_pearl",
+    "A": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "O": "minecraft:obsidian"
+  },
+  "result": {
+    "id": "project_cradle:blink",
+    "count": 1
+  }
+}

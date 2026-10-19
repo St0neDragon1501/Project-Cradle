@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "ABA",
+    "CRC"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "A": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "R": "minecraft:blaze_rod"
+  },
+  "result": {
+    "id": "project_cradle:chain_lightning",
+    "count": 1
+  }
+}

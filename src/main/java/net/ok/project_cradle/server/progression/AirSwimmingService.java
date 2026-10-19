@@ -9,7 +9,6 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -18,13 +17,13 @@ import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.madra.MadraPassives;
 import net.ok.project_cradle.capability.madra.MadraType;
 
-/** Authorizes Air movement without changing game-mode abilities or other flight grants. */
+/** Authorizes ordinary upright flight without changing other flight grants. */
 public final class AirSwimmingService {
     private static final String GENTLE_LANDING = "project_cradle.air_gentle_landing";
     private static final Identifier AIR_FLIGHT = Identifier.fromNamespaceAndPath(ProjectCradle.MODID, "air_swimming");
     private static final AttributeModifier FLIGHT_PERMISSION = new AttributeModifier(
             AIR_FLIGHT, 1.0, AttributeModifier.Operation.ADD_VALUE);
-    private static final Set<Player> OWNED_SWIMMING_POSES = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final Set<ServerPlayer> AIRBORNE_PLAYERS = Collections.newSetFromMap(new WeakHashMap<>());
 
     private AirSwimmingService() {
     }
@@ -38,7 +37,6 @@ public final class AirSwimmingService {
 
     public static void refresh(ServerPlayer player) {
         AttributeInstance flight = player.getAttribute(NeoForgeMod.CREATIVE_FLIGHT);
-        boolean wasAirborne = flight != null && flight.hasModifier(AIR_FLIGHT) && player.getAbilities().flying;
         if (flight != null) {
             if (canUseAir(player)) {
                 if (!flight.hasModifier(AIR_FLIGHT)) flight.addTransientModifier(FLIGHT_PERMISSION);
@@ -47,9 +45,12 @@ public final class AirSwimmingService {
             }
         }
         stopUnsupportedFlight(player);
-        if (wasAirborne && !player.getAbilities().flying) beginLanding(player);
-        updateSwimmingPose(player);
-        if (isAirSwimming(player)) player.resetFallDistance();
+        if (isAirFlying(player)) {
+            AIRBORNE_PLAYERS.add(player);
+            player.resetFallDistance();
+        } else if (AIRBORNE_PLAYERS.remove(player)) {
+            beginLanding(player);
+        }
         updateLanding(player);
     }
 
@@ -62,7 +63,7 @@ public final class AirSwimmingService {
         if (player.getAbilities().flying) {
             player.getAbilities().flying = false;
             player.onUpdateAbilities();
-            releaseSwimmingPose(player);
+            AIRBORNE_PLAYERS.remove(player);
             beginLanding(player);
             player.sendOverlayMessage(Component.translatable("message.project_cradle.air_flight_landing"));
             return;
@@ -77,7 +78,7 @@ public final class AirSwimmingService {
         player.getAbilities().flying = true;
         player.onUpdateAbilities();
         player.resetFallDistance();
-        updateSwimmingPose(player);
+        AIRBORNE_PLAYERS.add(player);
         player.sendOverlayMessage(Component.translatable("message.project_cradle.air_flight_started"));
     }
 
@@ -104,13 +105,13 @@ public final class AirSwimmingService {
     }
 
     public static void clear(ServerPlayer player) {
-        if (isAirSwimming(player) && !player.onGround()) {
+        if ((AIRBORNE_PLAYERS.contains(player) || isAirFlying(player)) && !player.onGround()) {
             player.getPersistentData().putBoolean(GENTLE_LANDING, true);
         }
+        AIRBORNE_PLAYERS.remove(player);
         AttributeInstance flight = player.getAttribute(NeoForgeMod.CREATIVE_FLIGHT);
         if (flight != null) flight.removeModifier(AIR_FLIGHT);
         stopUnsupportedFlight(player);
-        releaseSwimmingPose(player);
     }
 
     private static void stopUnsupportedFlight(ServerPlayer player) {
@@ -120,29 +121,10 @@ public final class AirSwimmingService {
         }
     }
 
-    public static boolean isAirSwimming(Player player) {
+    public static boolean isAirFlying(Player player) {
         AttributeInstance flight = player.getAttribute(NeoForgeMod.CREATIVE_FLIGHT);
         return canUseAir(player) && player.getAbilities().flying && player.mayFly()
                 && flight != null && flight.hasModifier(AIR_FLIGHT);
     }
 
-    /** Forced pose is separate from the water-only swimming flag in vanilla Player. */
-    public static synchronized void updateSwimmingPose(Player player) {
-        if (!isAirSwimming(player)) {
-            releaseSwimmingPose(player);
-            return;
-        }
-        if (player.getForcedPose() == null) {
-            player.setForcedPose(Pose.SWIMMING);
-            OWNED_SWIMMING_POSES.add(player);
-        } else if (player.getForcedPose() != Pose.SWIMMING) {
-            OWNED_SWIMMING_POSES.remove(player);
-        }
-    }
-
-    private static synchronized void releaseSwimmingPose(Player player) {
-        if (OWNED_SWIMMING_POSES.remove(player) && player.getForcedPose() == Pose.SWIMMING) {
-            player.setForcedPose(null);
-        }
-    }
 }

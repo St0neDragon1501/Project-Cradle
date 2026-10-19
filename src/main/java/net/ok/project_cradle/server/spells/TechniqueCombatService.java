@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.ok.project_cradle.capability.madra.MadraPassives;
 import net.ok.project_cradle.capability.madra.MadraType.Element;
 import net.ok.project_cradle.server.progression.DreamPacificationService;
+import net.ok.project_cradle.spells.TechniqueScaling;
 
 /** Shared ownership and hostile-hit rules for damaging and status-only sacred techniques. */
 public final class TechniqueCombatService {
@@ -18,13 +19,13 @@ public final class TechniqueCombatService {
     }
 
     public static boolean hurt(ServerPlayer caster, Entity direct, Entity target, float damage) {
-        if (!Float.isFinite(damage) || damage <= 0.0F || !canHit(caster, target)
+        if (!Float.isFinite(damage) || damage <= 0.0F || !canAffect(caster, target)
                 || (direct != null && direct.level() != caster.level())) {
             return false;
         }
         Entity source = direct == null ? caster : direct;
         DamageSource magic = caster.damageSources().indirectMagic(source, caster);
-        return target.hurtServer(caster.level(), new TechniqueDamageSource(magic, source, caster), damage);
+        return target.hurtServer(caster.level(), new TechniqueDamageSource(magic, source, caster), TechniqueScaling.damage(caster, damage));
     }
 
     /**
@@ -32,7 +33,7 @@ public final class TechniqueCombatService {
      * even when the caster has none of these Gold passives. This hook never deals damage or heals.
      */
     public static boolean onEffectHit(ServerPlayer caster, LivingEntity target) {
-        if (!canHit(caster, target)) return false;
+        if (!canAffect(caster, target)) return false;
         if (MadraPassives.has(caster, Element.FIRE)) target.igniteForSeconds(4.0F);
         if (MadraPassives.has(caster, Element.LIGHT)) {
             target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 100, 0, true, false, false));
@@ -44,7 +45,7 @@ public final class TechniqueCombatService {
         return true;
     }
 
-    private static boolean canHit(ServerPlayer caster, Entity target) {
+    public static boolean canAffect(ServerPlayer caster, Entity target) {
         if (caster == null || target == null || !(caster.level() instanceof ServerLevel)
                 || !caster.isAlive() || caster.isSpectator() || !target.isAlive()
                 || target == caster || target.level() != caster.level()

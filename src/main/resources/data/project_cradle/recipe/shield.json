@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    "ABA",
+    "PIP"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "A": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "P": "minecraft:prismarine_crystals"
+  },
+  "result": {
+    "id": "project_cradle:shield",
+    "count": 1
+  }
+}

@@ -27,6 +27,18 @@ public final class ModEntities {
                             .noSave()
             );
 
+    public static final Supplier<EntityType<RemnantEntity>> REMNANT = ENTITIES.registerEntityType(
+            "remnant", RemnantEntity::new, MobCategory.MONSTER,
+            builder -> builder.sized(0.9F, 2.1F).clientTrackingRange(10).updateInterval(2).fireImmune());
+
+    public static final Supplier<EntityType<MadraShieldEntity>> MADRA_SHIELD = ENTITIES.registerEntityType(
+            "madra_shield", MadraShieldEntity::new, MobCategory.MISC,
+            builder -> builder.sized(3.0F, 3.0F).clientTrackingRange(10).updateInterval(1).noSave());
+
+    public static final Supplier<EntityType<SpellBoltProjectile>> SPELL_BOLT = ENTITIES.registerEntityType(
+            "spell_bolt", SpellBoltProjectile::new, MobCategory.MISC,
+            builder -> builder.sized(0.35F, 0.35F).clientTrackingRange(12).updateInterval(1).noSave());
+
     /** Projectile techniques get separate entity registry IDs while sharing their common physics. */
     public static final Map<PathTechnique, Supplier<EntityType<PathTechniqueProjectile>>> PATH_PROJECTILES =
             registerPathProjectiles();

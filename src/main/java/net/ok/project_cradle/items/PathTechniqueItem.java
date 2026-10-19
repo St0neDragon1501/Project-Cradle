@@ -14,6 +14,10 @@ public final class PathTechniqueItem extends MadraTechniqueItem {
         this.technique = technique;
     }
 
+    public PathTechnique getTechnique() {
+        return this.technique;
+    }
+
     @Override
     public boolean castTechnique(ServerPlayer player, ItemStack stack) {
         return PathTechniqueSpell.cast(player, stack, this.technique);

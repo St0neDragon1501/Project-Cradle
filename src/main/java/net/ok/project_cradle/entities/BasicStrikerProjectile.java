@@ -1,6 +1,8 @@
 package net.ok.project_cradle.entities;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.ok.project_cradle.server.spells.TechniqueVisualService;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -80,7 +82,7 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
         this.burnOnHit = burnOnHit;
     }
 
-    private float getSpellDamage() {
+    protected float getSpellDamage() {
         return this.getEntityData().get(DATA_SPELL_DAMAGE);
     }
 
@@ -107,7 +109,7 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
             }
         }
 
-        if (this.level().isClientSide()) {
+        if (this.level().isClientSide() && !this.isInvisible()) {
             this.level().addParticle(
                     this.getTrailParticle(),
                     this.getRandomX(0.18),
@@ -174,7 +176,7 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
         this.disperse();
     }
 
-    private void disperse() {
+    protected void disperse() {
         if (!this.level().isClientSide()) {
             this.level().broadcastEntityEvent(this, (byte) 3);
             this.discard();
@@ -192,84 +194,20 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
     }
 
     private ParticleOptions getTrailParticle() {
-        return switch (this.getMadraElement()) {
-            case FIRE -> ParticleTypes.FLAME;
-            case WATER -> ParticleTypes.BUBBLE;
-            case AIR -> ParticleTypes.CLOUD;
-            case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
-            case PURE -> ParticleTypes.ENCHANT;
-            case LIFE -> ParticleTypes.HAPPY_VILLAGER;
-            case DEATH -> ParticleTypes.SOUL;
-            case LIGHT -> ParticleTypes.END_ROD;
-            case SHADOW -> ParticleTypes.SMOKE;
-            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
-            case DREAM -> ParticleTypes.WITCH;
-            case DESTRUCTION -> ParticleTypes.EXPLOSION;
-            case FORCE -> ParticleTypes.GUST;
-            case SWORD -> ParticleTypes.CRIT;
-            case HUNGER -> ParticleTypes.SQUID_INK;
-        };
+        return new DustParticleOptions(TechniqueVisualService.color(this.getMadraElement()), 0.65F);
     }
 
     private ParticleOptions getSecondaryTrailParticle() {
         return switch (this.getMadraElement()) {
-            case FIRE -> ParticleTypes.SMOKE;
-            case WATER -> ParticleTypes.SPLASH;
-            case AIR -> ParticleTypes.SWEEP_ATTACK;
-            case EARTH -> ParticleTypes.POOF;
-            case PURE -> ParticleTypes.ENCHANTED_HIT;
-            case LIFE -> ParticleTypes.COMPOSTER;
-            case DEATH -> ParticleTypes.SOUL_FIRE_FLAME;
-            case LIGHT -> ParticleTypes.GLOW;
-            case SHADOW -> ParticleTypes.LARGE_SMOKE;
-            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
-            case DREAM -> ParticleTypes.PORTAL;
-            case DESTRUCTION -> ParticleTypes.EXPLOSION_EMITTER;
-            case FORCE -> ParticleTypes.SMALL_GUST;
-            case SWORD -> ParticleTypes.SWEEP_ATTACK;
-            case HUNGER -> ParticleTypes.GLOW_SQUID_INK;
+            case FIRE, DESTRUCTION -> ParticleTypes.SMALL_FLAME;
+            case WATER -> ParticleTypes.SNOWFLAKE;
+            case SHADOW, DEATH, HUNGER -> ParticleTypes.SMOKE;
+            default -> ParticleTypes.END_ROD;
         };
     }
 
-    private ParticleOptions getBurstParticle() {
-        return switch (this.getMadraElement()) {
-            case FIRE -> ParticleTypes.FLAME;
-            case WATER -> ParticleTypes.SPLASH;
-            case AIR -> ParticleTypes.CLOUD;
-            case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
-            case PURE -> ParticleTypes.ENCHANT;
-            case LIFE -> ParticleTypes.HEART;
-            case DEATH -> ParticleTypes.SOUL;
-            case LIGHT -> ParticleTypes.END_ROD;
-            case SHADOW -> ParticleTypes.SMOKE;
-            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
-            case DREAM -> ParticleTypes.WITCH;
-            case DESTRUCTION -> ParticleTypes.EXPLOSION;
-            case FORCE -> ParticleTypes.GUST;
-            case SWORD -> ParticleTypes.CRIT;
-            case HUNGER -> ParticleTypes.SQUID_INK;
-        };
-    }
-
-    private ParticleOptions getSecondaryBurstParticle() {
-        return switch (this.getMadraElement()) {
-            case FIRE -> ParticleTypes.LARGE_SMOKE;
-            case WATER -> ParticleTypes.BUBBLE;
-            case AIR -> ParticleTypes.SWEEP_ATTACK;
-            case EARTH -> ParticleTypes.POOF;
-            case PURE -> ParticleTypes.ENCHANTED_HIT;
-            case LIFE -> ParticleTypes.HAPPY_VILLAGER;
-            case DEATH -> ParticleTypes.SOUL_FIRE_FLAME;
-            case LIGHT -> ParticleTypes.GLOW;
-            case SHADOW -> ParticleTypes.LARGE_SMOKE;
-            case BLOOD -> ParticleTypes.DAMAGE_INDICATOR;
-            case DREAM -> ParticleTypes.PORTAL;
-            case DESTRUCTION -> ParticleTypes.EXPLOSION_EMITTER;
-            case FORCE -> ParticleTypes.SMALL_GUST;
-            case SWORD -> ParticleTypes.SWEEP_ATTACK;
-            case HUNGER -> ParticleTypes.GLOW_SQUID_INK;
-        };
-    }
+    private ParticleOptions getBurstParticle() { return this.getTrailParticle(); }
+    private ParticleOptions getSecondaryBurstParticle() { return this.getSecondaryTrailParticle(); }
 
     private void emitBurst(ParticleOptions particle, int count, double spread) {
         for (int i = 0; i < count; i++) {
