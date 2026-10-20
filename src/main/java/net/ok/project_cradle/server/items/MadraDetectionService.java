@@ -9,43 +9,59 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.ok.project_cradle.capability.ModAttachments;
-import net.ok.project_cradle.capability.core.Core;
-import net.ok.project_cradle.server.progression.ProgressionService;
 import net.ok.project_cradle.capability.core.advancement.AdvancementLevel;
-import net.ok.project_cradle.capability.madra.Madra;
-import net.ok.project_cradle.capability.madra.MadraType;
-import net.ok.project_cradle.capability.madra.MaxMadra;
 import net.ok.project_cradle.server.world.AuraService;
+import net.ok.project_cradle.items.ModItems;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.server.level.ServerPlayer;
 
-/** Samples aura, restores Madra, and evaluates advancement on the server. */
+/** Gathers compatible aura into the existing core and reports object recovery times. */
 public final class MadraDetectionService {
     private MadraDetectionService() {
     }
 
     public static InteractionResult absorbAura(ServerPlayer player) {
-        Core core = player.getData(ModAttachments.CORE);
-        if (core.getAdvancement().order() < AdvancementLevel.COPPER.order()) {
-            player.sendSystemMessage(Component.translatable("message.project_cradle.need_copper_sight"));
-            return InteractionResult.FAIL;
+        if (!canGather(player)) return InteractionResult.FAIL;
+        if (player.isShiftKeyDown() && player.getData(ModAttachments.CORE).getAdvancement().order() >= AdvancementLevel.JADE.order()) {
+            senseNearbyArtists(player);
+            return InteractionResult.SUCCESS;
         }
-        AuraService.Reading reading = AuraService.detect(player);
-        if (reading.hasAura()) player.sendSystemMessage(Component.translatable("message.project_cradle.aura_detected", Component.translatable(reading.aspect().translationKey())));
-        MadraType type = player.getData(ModAttachments.MADRA_TYPE);
-        double amount = reading.compatibleYield(type);
-        if (amount > 0.0) {
-            MaxMadra maximum = player.getData(ModAttachments.MAXMADRA);
-            maximum.addMaxMadra(amount);
-            player.getData(ModAttachments.MADRA).addMadra(amount, maximum.getLevel());
-            player.sendSystemMessage(Component.translatable("message.project_cradle.compatible_aura_absorbed", amount));
-            ProgressionService.evaluateCapacity(player);
-            player.syncData(ModAttachments.MADRA);
-            player.syncData(ModAttachments.MAXMADRA);
-        } else {
-            player.sendSystemMessage(Component.translatable("message.project_cradle.no_compatible_aura"));
+        return report(player, AuraService.harvestBest(player, AuraService.detect(player)));
+    }
+
+    public static InteractionResult absorbBlock(ServerPlayer player, BlockPos position) {
+        if (!canGather(player)) return InteractionResult.FAIL;
+        return report(player, AuraService.harvestBlock(player, position));
+    }
+
+    public static InteractionResult absorbEntity(ServerPlayer player, LivingEntity target) {
+        if (!canGather(player)) return InteractionResult.FAIL;
+        return report(player, AuraService.harvestEntity(player, target));
+    }
+
+    private static boolean canGather(ServerPlayer player) {
+        if (!player.isAlive() || player.isSpectator()) return false;
+        ItemStack detector = new ItemStack(ModItems.MADRA_DETETION.get());
+        if (player.getCooldowns().isOnCooldown(detector)) return false;
+        player.getCooldowns().addCooldown(detector, 10);
+        if (player.getData(ModAttachments.CORE).getAdvancement().order() < AdvancementLevel.COPPER.order()) {
+            player.sendOverlayMessage(Component.translatable("message.project_cradle.need_copper_sight"));
+            return false;
         }
-        if (core.getAdvancement().order() >= AdvancementLevel.JADE.order()) senseNearbyArtists(player);
+        return true;
+    }
+
+    private static InteractionResult report(ServerPlayer player, AuraService.Harvest harvest) {
+        switch (harvest.status()) {
+            case GATHERED -> player.sendOverlayMessage(Component.translatable("message.project_cradle.aura_gathered",
+                    String.format(java.util.Locale.ROOT, "%.1f", harvest.amount())));
+            case FULL -> player.sendOverlayMessage(Component.translatable("message.project_cradle.madra_full"));
+            case COOLING -> player.sendOverlayMessage(Component.translatable("message.project_cradle.aura_source_cooldown",
+                    Math.max(1L, (harvest.remainingTicks() + 19L) / 20L)));
+            case INCOMPATIBLE, NO_SOURCE -> player.sendOverlayMessage(Component.translatable("message.project_cradle.no_compatible_aura"));
+        }
         return InteractionResult.SUCCESS;
     }
 

@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/flame_ring",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -2069464
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "structures": [
+    {
+      "structure": "project_cradle:bamboo_hermitage",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:cherry_tea_house",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:cedar_minka",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:lantern_shop_house",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:riverside_stilt_house",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:scholar_courtyard",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:moon_gate_villa",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:mountain_lodge",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:jade_clan_manor",
+      "weight": 1
+    },
+    {
+      "structure": "project_cradle:cloud_pagoda_residence",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 32,
+    "separation": 12,
+    "spread_type": "linear",
+    "salt": 1876439021
+  }
+}

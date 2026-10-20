@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:redstone",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:fermented_spider_eye"
+  },
+  "result": {
+    "id": "project_cradle:crimson_siphon",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:wither_rose",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:bone"
+  },
+  "result": {
+    "id": "project_cradle:withering_touch",
+    "count": 1
+  }
+}

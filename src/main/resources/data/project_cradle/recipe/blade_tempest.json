@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:iron_sword",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:quartz"
+  },
+  "result": {
+    "id": "project_cradle:blade_tempest",
+    "count": 1
+  }
+}

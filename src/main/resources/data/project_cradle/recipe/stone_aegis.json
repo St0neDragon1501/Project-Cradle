@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:iron_ingot",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:stone"
+  },
+  "result": {
+    "id": "project_cradle:stone_aegis",
+    "count": 1
+  }
+}

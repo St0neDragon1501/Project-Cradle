@@ -6,6 +6,7 @@ import net.ok.project_cradle.capability.madra.MadraType;
 import net.ok.project_cradle.items.AdditionalTechniqueItem;
 import net.ok.project_cradle.items.BasicStrikerItem;
 import net.ok.project_cradle.items.EnforcerTechniqueItem;
+import net.ok.project_cradle.items.ElementalTechniqueItem;
 import net.ok.project_cradle.items.ForgerTechniqueItem;
 import net.ok.project_cradle.items.PathTechniqueItem;
 import net.ok.project_cradle.items.RulerTechniqueItem;
@@ -18,6 +19,11 @@ public record TechniqueCastProfile(int castTimeTicks, double madraCost, double s
         if (stack == null || stack.isEmpty()) return null;
         if (stack.getItem() instanceof AdditionalTechniqueItem item) {
             AdditionalTechnique technique = item.getTechnique();
+            return new TechniqueCastProfile(technique.castTimeTicks(), technique.madraCost(), 0.0,
+                    technique.cooldownTicks(), technique.aspect());
+        }
+        if (stack.getItem() instanceof ElementalTechniqueItem item) {
+            ElementalTechnique technique = item.getTechnique();
             return new TechniqueCastProfile(technique.castTimeTicks(), technique.madraCost(), 0.0,
                     technique.cooldownTicks(), technique.aspect());
         }

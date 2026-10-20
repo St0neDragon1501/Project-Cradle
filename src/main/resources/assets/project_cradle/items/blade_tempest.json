@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/blade_tempest",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -6169109
+      }
+    ]
+  }
+}

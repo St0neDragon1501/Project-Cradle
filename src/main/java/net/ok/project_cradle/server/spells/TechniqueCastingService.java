@@ -21,6 +21,7 @@ import net.ok.project_cradle.capability.madra.MadraType;
 import net.ok.project_cradle.items.TechniqueItem;
 import net.ok.project_cradle.networking.packet.CastingStateS2C;
 import net.ok.project_cradle.spells.TechniqueCastProfile;
+import net.ok.project_cradle.server.progression.TechniqueKnowledge;
 
 /** One server-owned preparation per player. Resources are paid by the spell at completion. */
 public final class TechniqueCastingService {
@@ -39,6 +40,7 @@ public final class TechniqueCastingService {
         if (profile.castTimeTicks() <= 0) {
             boolean cast = technique.castTechnique(player, stack);
             if (cast) {
+                TechniqueKnowledge.recordSuccessfulCast(player, stack);
                 emitRunes(player, profile, 16, 0.32);
                 TechniqueVisualService.complete(player, stack, profile);
             }
@@ -92,6 +94,7 @@ public final class TechniqueCastingService {
             player.connection.send(new CastingStateS2C("", 0, false));
             if (ready(player, cast.stack(), cast.profile(), true)
                     && ((TechniqueItem) cast.stack().getItem()).castTechnique(player, cast.stack())) {
+                TechniqueKnowledge.recordSuccessfulCast(player, cast.stack());
                 emitRunes(player, cast.profile(), 16, 0.32);
                 TechniqueVisualService.complete(player, cast.stack(), cast.profile());
             }

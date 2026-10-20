@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
@@ -160,6 +161,14 @@ public final class AdditionalTechniqueSpell {
                 target -> isHostileTarget(player, target) && player.hasLineOfSight(target)
                         && inCone(eye, look, target.getEyePosition(), range, 0.75))) {
             if (TechniqueCastingService.cancel(caster)) {
+                cancelled = true;
+                lightning(level, eye, caster.getEyePosition());
+            }
+        }
+        for (Mob caster : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(range),
+                target -> MobTechniqueService.isCaster(target) && isHostileTarget(player, target) && player.hasLineOfSight(target)
+                        && inCone(eye, look, target.getEyePosition(), range, 0.75))) {
+            if (MobTechniqueService.cancel(caster)) {
                 cancelled = true;
                 lightning(level, eye, caster.getEyePosition());
             }

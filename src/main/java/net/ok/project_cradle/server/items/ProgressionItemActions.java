@@ -61,9 +61,16 @@ public final class ProgressionItemActions {
     }
 
     public static InteractionResult absorbRemnant(ServerPlayer player, InteractionHand hand) {
-        MadraType.Element aspect = RemnantAspectData.get(player.getItemInHand(hand), player.getData(ModAttachments.MADRA_TYPE).getTypes().get(0));
+        var sourceAspects = RemnantAspectData.getTypes(player.getItemInHand(hand));
+        var playerAspects = player.getData(ModAttachments.MADRA_TYPE).getTypes();
+        MadraType.Element aspect = sourceAspects.isEmpty() ? playerAspects.get(0)
+                : sourceAspects.stream().filter(playerAspects::contains).findFirst().orElse(sourceAspects.get(0));
         if (!ProgressionService.absorbRemnant(player, aspect)) {
-            player.sendSystemMessage(Component.translatable("message.project_cradle.remnant_requires_jade_or_archlord"));
+            Core core = player.getData(ModAttachments.CORE);
+            // The progression service already explains an incompatible stored aspect.
+            if (playerAspects.contains(aspect) || core.getAdvancement() != AdvancementLevel.JADE || !core.hasJadeSpiral()) {
+                player.sendSystemMessage(Component.translatable("message.project_cradle.remnant_requires_jade_or_archlord"));
+            }
             return InteractionResult.FAIL;
         }
 

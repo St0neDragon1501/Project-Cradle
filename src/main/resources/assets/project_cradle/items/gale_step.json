@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/gale_step",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -4589348
+      }
+    ]
+  }
+}

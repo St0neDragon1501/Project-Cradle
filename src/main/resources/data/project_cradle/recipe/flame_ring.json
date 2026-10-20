@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:blaze_powder",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:magma_cream"
+  },
+  "result": {
+    "id": "project_cradle:flame_ring",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:slime_ball",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "project_cradle:repulsion_wave",
+    "count": 1
+  }
+}

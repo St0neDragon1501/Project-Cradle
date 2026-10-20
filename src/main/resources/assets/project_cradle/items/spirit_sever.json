@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/spirit_sever",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -1836545
+      }
+    ]
+  }
+}

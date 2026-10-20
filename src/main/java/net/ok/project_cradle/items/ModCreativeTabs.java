@@ -28,6 +28,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.BASIC_STRIKER);
                         ModItems.PATH_TECHNIQUES.forEach(output::accept);
                         ModItems.ADDITIONAL_TECHNIQUES.forEach(output::accept);
+                        ModItems.ELEMENTAL_TECHNIQUES.forEach(output::accept);
                         output.accept(ModItems.FORGER_TECHNIQUE);
                         output.accept(ModItems.ENFORCER_TECHNIQUE);
                         output.accept(ModItems.RULER_TECHNIQUE);

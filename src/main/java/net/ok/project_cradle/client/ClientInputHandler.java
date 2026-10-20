@@ -14,14 +14,20 @@ import net.ok.project_cradle.networking.packet.QuickDropKeyC2S;
 
 @EventBusSubscriber(modid = ProjectCradle.MODID, value = Dist.CLIENT)
 public final class ClientInputHandler {
+    private static int cyclingDelay;
     private ClientInputHandler() {
     }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         boolean noScreenOpen = Minecraft.getInstance().gui.screen() == null;
-        while (ModKeyMappings.PRESS_CYCLING.get().consumeClick()) {
+        if (cyclingDelay > 0) cyclingDelay--;
+        boolean cyclePressed = false;
+        while (ModKeyMappings.PRESS_CYCLING.get().consumeClick()) cyclePressed = true;
+        if (noScreenOpen && Minecraft.getInstance().player != null && cyclingDelay <= 0
+                && (cyclePressed || ModKeyMappings.PRESS_CYCLING.get().isDown())) {
             ClientPacketDistributor.sendToServer(new CycleC2S(0));
+            cyclingDelay = 10;
         }
 
         while (ModKeyMappings.TOGGLE_AIR_FLIGHT.consumeClick()) {

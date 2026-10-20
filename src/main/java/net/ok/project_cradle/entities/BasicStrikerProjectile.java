@@ -3,6 +3,7 @@ package net.ok.project_cradle.entities;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.ok.project_cradle.server.spells.TechniqueVisualService;
+import net.ok.project_cradle.server.spells.MobTechniqueService;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -11,6 +12,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -101,6 +103,11 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
     @Override
     public void tick() {
         if (!this.level().isClientSide()) {
+            // Water can slow a bolt before it reaches its travel limit.
+            if (this.tickCount >= 200) {
+                this.disperse();
+                return;
+            }
             Vec3 movement = this.getDeltaMovement();
             double remainingDistance = this.maxTravelDistance - this.distanceTravelled;
             double movementLength = movement.length();
@@ -143,12 +150,21 @@ public class BasicStrikerProjectile extends ThrowableItemProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity target) {
+        if (!super.canHitEntity(target)) return false;
+        return !(this.getOwner() instanceof Mob caster) || !MobTechniqueService.isCaster(caster)
+                || !(target instanceof LivingEntity living) || MobTechniqueService.canHarm(caster, living);
+    }
+
+    @Override
     protected void onHitEntity(EntityHitResult hitResult) {
         if (this.level().isClientSide()) {
             return;
         }
 
         Entity target = hitResult.getEntity();
+        if (this.getOwner() instanceof Mob caster && MobTechniqueService.isCaster(caster)
+                && target instanceof LivingEntity living && !MobTechniqueService.canHarm(caster, living)) return;
         float damage = this.getSpellDamage() + MadraAspectEffects.bonusDamage(this.getMadraElement());
         boolean landed = this.getOwner() instanceof ServerPlayer caster
                 ? TechniqueCombatService.hurt(caster, this, target, damage)

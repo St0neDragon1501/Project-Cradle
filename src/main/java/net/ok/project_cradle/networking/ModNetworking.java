@@ -25,7 +25,7 @@ public final class ModNetworking {
 
     @SubscribeEvent
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("5").executesOn(HandlerThread.MAIN);
+        PayloadRegistrar registrar = event.registrar("6").executesOn(HandlerThread.MAIN);
         registrar.playToServer(ToggleAirFlightC2S.TYPE, ToggleAirFlightC2S.STREAM_CODEC, AirFlightPayloadHandler::handle);
         registrar.playToClient(CastingStateS2C.TYPE, CastingStateS2C.STREAM_CODEC);
         registrar.playToServer(CancelCastC2S.TYPE, CancelCastC2S.STREAM_CODEC, CancelCastPayloadHandler::handle);

@@ -16,6 +16,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -25,6 +26,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.ok.project_cradle.server.spells.AdditionalTechniqueSpell;
 import net.ok.project_cradle.server.spells.TechniqueCombatService;
+import net.ok.project_cradle.server.spells.MobTechniqueService;
 import net.ok.project_cradle.spells.AdditionalTechnique;
 import net.ok.project_cradle.spells.TechniqueScaling;
 
@@ -84,8 +86,9 @@ public final class SpellBoltProjectile extends BasicStrikerProjectile {
     protected boolean canHitEntity(Entity target) {
         if (this.pierced.contains(target.getUUID()) || !super.canHitEntity(target)) return false;
         if (target instanceof MadraShieldEntity shield) return shield.isPickable();
-        return this.getOwner() instanceof ServerPlayer caster
-                && target instanceof LivingEntity living && AdditionalTechniqueSpell.isHostileTarget(caster, living);
+        if (!(target instanceof LivingEntity living)) return false;
+        if (this.getOwner() instanceof ServerPlayer caster) return AdditionalTechniqueSpell.isHostileTarget(caster, living);
+        return this.getOwner() instanceof Mob caster && MobTechniqueService.isCaster(caster) && MobTechniqueService.canHarm(caster, living);
     }
 
     @Override
@@ -103,9 +106,14 @@ public final class SpellBoltProjectile extends BasicStrikerProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult hit) {
-        if (!(this.getOwner() instanceof ServerPlayer caster) || !(hit.getEntity() instanceof LivingEntity target)
+        if (!(hit.getEntity() instanceof LivingEntity target)
+                || !(this.getOwner() instanceof ServerPlayer
+                        || this.getOwner() instanceof Mob mob && MobTechniqueService.isCaster(mob))
                 || !this.pierced.add(target.getUUID())) return;
-        if (TechniqueCombatService.hurt(caster, this, target, this.getSpellDamage())) {
+        boolean hurt = this.getOwner() instanceof ServerPlayer caster
+                ? TechniqueCombatService.hurt(caster, this, target, this.getSpellDamage())
+                : MobTechniqueService.hurt((Mob) this.getOwner(), this, target, this.getSpellDamage());
+        if (hurt) {
             target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 2, true, true, true));
             ((ServerLevel) this.level()).sendParticles(ParticleTypes.SNOWFLAKE,
                     target.getX(), target.getY() + 0.8, target.getZ(), 12, 0.3, 0.6, 0.3, 0.03);
@@ -118,7 +126,8 @@ public final class SpellBoltProjectile extends BasicStrikerProjectile {
         double growth = Math.min(1.0, this.tickCount / 24.0);
         double baseRadius = 2.0 + growth;
         double radius = this.getOwner() instanceof ServerPlayer caster
-                ? TechniqueScaling.range(caster, baseRadius) : baseRadius;
+                ? TechniqueScaling.range(caster, baseRadius)
+                : this.getOwner() instanceof Mob mob && MobTechniqueService.isCaster(mob) ? MobTechniqueService.range(mob, baseRadius) : baseRadius;
         if (this.getOwner() instanceof ServerPlayer caster) {
             for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
                     this.getBoundingBox().inflate(radius), entity -> AdditionalTechniqueSpell.isHostileTarget(caster, entity)
@@ -127,6 +136,15 @@ public final class SpellBoltProjectile extends BasicStrikerProjectile {
                 if (TechniqueCombatService.hurt(caster, this, target, (this.getSpellDamage() + (float) growth * 4.0F) * falloff)) {
                     target.igniteForSeconds(5.0F);
                 }
+            }
+        }
+        if (this.getOwner() instanceof Mob caster && MobTechniqueService.isCaster(caster)) {
+            for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
+                    this.getBoundingBox().inflate(radius), entity -> MobTechniqueService.canHarm(caster, entity)
+                            && entity.distanceToSqr(this) <= radius * radius && this.hasLineOfSightTo(entity))) {
+                float falloff = (float) Math.max(0.3, 1.0 - target.distanceTo(this) / (radius + 0.5));
+                float growingDamage = this.getSpellDamage() + (float) (growth * 4.0 * MobTechniqueService.power(caster));
+                if (MobTechniqueService.hurt(caster, this, target, growingDamage * falloff)) target.igniteForSeconds(5.0F);
             }
         }
         level.sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);

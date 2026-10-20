@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +17,6 @@ import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.tags.BlockTags;
@@ -37,12 +35,15 @@ import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.entities.ModEntities;
 import net.ok.project_cradle.entities.RemnantEntity;
 import net.ok.project_cradle.entities.RemnantForm;
+import net.ok.project_cradle.spells.TechniqueCatalog;
+import net.ok.project_cradle.server.progression.TechniqueKnowledge;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.SacredBeastAge;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.core.advancement.AdvancementLevel;
 import net.ok.project_cradle.items.ModItems;
 import net.ok.project_cradle.server.world.AuraService;
+import net.ok.project_cradle.server.world.SacredBeastService;
 import net.ok.project_cradle.server.progression.RemnantFusionService;
 import net.ok.project_cradle.server.progression.SpiritBondService;
 import net.ok.project_cradle.server.progression.RemnantAspectData;
@@ -70,11 +71,17 @@ public final class SacredWorldEvents {
             }
             return;
         }
-        // A developed, viable spirit leaves an echo; existing spirits cannot leave another one.
-        LivingEntity source = event.getEntity();
+        trySpawnRemnant(event.getEntity(), event.getSource().getEntity() instanceof LivingEntity attacker ? attacker : null);
+    }
+
+    /** Shared with deaths that bypass LivingDeathEvent, such as a creeper's own explosion. */
+    public static void trySpawnRemnant(LivingEntity source, LivingEntity attacker) {
+        if (!(source.level() instanceof ServerLevel level)
+                || source.getPersistentData().getBooleanOr("project_cradle.remnant_formed", false)) return;
+        // A developed, viable spirit leaves an echo; existing mod spirits cannot leave another one.
         Core deceased = source.getData(ModAttachments.CORE);
         boolean sacredBeast = source.getData(ModAttachments.SACRED_BEAST_AGE).isSacred();
-        if (source instanceof Vex || source instanceof RemnantEntity
+        if (source instanceof Vex && !sacredBeast || source instanceof RemnantEntity
                 || source.entityTags().contains(REMNANT_TAG)
                 || source.entityTags().contains(SpiritBondService.WILD_SPIRIT_TAG)
                 || source.entityTags().contains("project_cradle.dreadbeast")
@@ -101,9 +108,11 @@ public final class SacredWorldEvents {
             remnant.setCustomName(Component.translatable("entity.project_cradle.remnant_of", source.getName()));
             remnant.setCustomNameVisible(true);
         }
-        if (event.getSource().getEntity() instanceof LivingEntity attacker && attacker != source
-                && attacker.isAlive() && !attacker.isSpectator()) remnant.setTarget(attacker);
-        if (level.addFreshEntity(remnant)) remnant.spawnAnim();
+        if (attacker != null && attacker != source && attacker.isAlive() && !attacker.isSpectator()) remnant.setTarget(attacker);
+        if (level.addFreshEntity(remnant)) {
+            source.getPersistentData().putBoolean("project_cradle.remnant_formed", true);
+            remnant.spawnAnim();
+        }
     }
 
     @SubscribeEvent
@@ -113,10 +122,8 @@ public final class SacredWorldEvents {
         }
 
         Entity entity = event.getEntity();
-        if (RemnantFusionService.isOwnRemnant(entity)) {
-            return;
-        }
-        boolean remnant = entity instanceof RemnantEntity || entity.entityTags().contains(REMNANT_TAG);
+        boolean remnant = entity instanceof RemnantEntity || entity.entityTags().contains(REMNANT_TAG)
+                || RemnantFusionService.isOwnRemnant(entity);
         SacredBeastAge beastAge = entity.getData(ModAttachments.SACRED_BEAST_AGE);
         if (!remnant && !beastAge.isSacred()) {
             return;
@@ -124,8 +131,16 @@ public final class SacredWorldEvents {
 
         if (remnant) {
             ItemStack binding = new ItemStack(ModItems.REMNANT_BINDING.get());
-            RemnantAspectData.set(binding, entity.getData(ModAttachments.MADRA_TYPE).getTypes().get(0));
+            RemnantAspectData.set(binding, entity.getData(ModAttachments.MADRA_TYPE).getTypes());
             event.getDrops().add(new ItemEntity(level, entity.getX(), entity.getY(), entity.getZ(), binding));
+            List<String> known = entity instanceof RemnantEntity spirit ? spirit.getKnownTechniques()
+                    : TechniqueKnowledge.capture(event.getEntity());
+            List<String> extra = known.stream().filter(id -> !id.equals(TechniqueCatalog.basic())).toList();
+            List<String> choices = extra.isEmpty() ? known : extra;
+            String id = choices.isEmpty() ? TechniqueCatalog.basic() : choices.get(level.getRandom().nextInt(choices.size()));
+            ItemStack technique = TechniqueCatalog.stack(id);
+            if (technique.isEmpty()) technique = new ItemStack(ModItems.BASIC_STRIKER.get());
+            event.getDrops().add(new ItemEntity(level, entity.getX(), entity.getY(), entity.getZ(), technique));
         }
         if (beastAge.isSacred()) {
             event.getDrops().add(new ItemEntity(level, entity.getX(), entity.getY(), entity.getZ(),
@@ -179,8 +194,7 @@ public final class SacredWorldEvents {
         if (!age.wasCenturyChecked() && age.getLivedTicks() >= SACRED_BEAST_AGE_TICKS) {
             age.markCenturyChecked();
             if (animal.getRandom().nextInt(20) == 0) {
-                age.setSacred(true);
-                strengthenSacredBeast(animal);
+                SacredBeastService.awaken(animal);
             }
         }
     }
@@ -279,37 +293,6 @@ public final class SacredWorldEvents {
         dreadgod.setCustomNameVisible(true);
         dreadgod.setPersistenceRequired();
         level.addFreshEntity(dreadgod);
-    }
-
-    private static void strengthenSacredBeast(Animal animal) {
-        animal.getData(ModAttachments.CORE).setAdvancement(AdvancementLevel.LOWGOLD);
-        animal.getData(ModAttachments.MADRA_TYPE).setTypes(List.of(MadraType.Element.LIFE));
-        animal.getData(ModAttachments.MAXMADRA).setALevel(2_000.0);
-        addModifier(animal, "sacred_beast_health", Attributes.MAX_HEALTH, 40.0);
-        addModifier(animal, "sacred_beast_damage", Attributes.ATTACK_DAMAGE, 8.0);
-        addModifier(animal, "sacred_beast_knockback", Attributes.KNOCKBACK_RESISTANCE, 0.75);
-        if (animal instanceof Mob mob) {
-            mob.setPersistenceRequired();
-        }
-        if (animal.getCustomName() == null) {
-            animal.setCustomName(Component.translatable("entity.project_cradle.sacred_beast"));
-            animal.setCustomNameVisible(true);
-        }
-    }
-
-    private static void addModifier(Entity entity, String name,
-            net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double amount) {
-        if (!(entity instanceof net.minecraft.world.entity.LivingEntity living)) {
-            return;
-        }
-        AttributeInstance instance = living.getAttribute(attribute);
-        if (instance == null) {
-            return;
-        }
-        Identifier id = Identifier.fromNamespaceAndPath(ProjectCradle.MODID, name);
-        if (instance.getModifier(id) == null) {
-            instance.addPermanentModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
-        }
     }
 
     private static boolean isAtLeastJade(Core core) {

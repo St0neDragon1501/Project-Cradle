@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:lapis_lazuli",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:popped_chorus_fruit"
+  },
+  "result": {
+    "id": "project_cradle:dream_snare",
+    "count": 1
+  }
+}

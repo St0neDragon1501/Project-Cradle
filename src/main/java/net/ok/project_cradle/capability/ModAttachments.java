@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.core.Core;
 import net.ok.project_cradle.capability.madra.*;
+import net.ok.project_cradle.server.world.AuraHarvestCooldowns;
 
 public class ModAttachments {
 
@@ -45,6 +46,19 @@ public class ModAttachments {
             ATTACHMENT_TYPES.register(
                     "sacred_beast_age",
                     () -> AttachmentType.serializable(SacredBeastAge::new).build()
+            );
+
+    public static final Supplier<AttachmentType<AuraHarvestCooldowns>> AURA_HARVEST_COOLDOWNS =
+            ATTACHMENT_TYPES.register("aura_harvest_cooldowns",
+                    () -> AttachmentType.serializable(AuraHarvestCooldowns::new).build());
+
+    public static final Supplier<AttachmentType<SacredBeastAppearance>> SACRED_BEAST_APPEARANCE =
+            ATTACHMENT_TYPES.register(
+                    "sacred_beast_appearance",
+                    () -> AttachmentType.builder(() -> SacredBeastAppearance.NONE)
+                            .serialize(SacredBeastAppearance.CODEC, SacredBeastAppearance::sacred)
+                            .sync(SacredBeastAppearance.STREAM_CODEC)
+                            .build()
             );
     
     

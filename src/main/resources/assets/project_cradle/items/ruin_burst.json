@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/ruin_burst",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -5283114
+      }
+    ]
+  }
+}

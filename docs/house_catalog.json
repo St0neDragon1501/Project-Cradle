@@ -1,0 +1,112 @@
+[
+  {
+    "id": "bamboo_hermitage",
+    "name": "Bamboo Hermitage",
+    "style": "Small East Asian bamboo cottage",
+    "description": "A single sleeping nook, paper windows, tiled gable and outdoor storage under deep eaves.",
+    "width": 5,
+    "depth": 7,
+    "height": 10,
+    "placed_blocks": 184,
+    "palette": 21
+  },
+  {
+    "id": "cherry_tea_house",
+    "name": "Cherry Tea House",
+    "style": "Japanese-inspired cherry cottage",
+    "description": "Pink timber, a shaded tea veranda, sleeping corner and a stone approach.",
+    "width": 11,
+    "depth": 13,
+    "height": 13,
+    "placed_blocks": 621,
+    "palette": 30
+  },
+  {
+    "id": "cedar_minka",
+    "name": "Cedar Minka",
+    "style": "Japanese minka-inspired timber home",
+    "description": "A steep gable, exposed beams, twin beds, pantry and a covered hearth.",
+    "width": 15,
+    "depth": 17,
+    "height": 16,
+    "placed_blocks": 1636,
+    "palette": 27
+  },
+  {
+    "id": "lantern_shop_house",
+    "name": "Lantern Shop House",
+    "style": "Chinese-inspired two-storey street home",
+    "description": "A front counter, deep pantry, hanging lanterns and a separate upstairs dwelling.",
+    "width": 13,
+    "depth": 19,
+    "height": 19,
+    "placed_blocks": 1357,
+    "palette": 32
+  },
+  {
+    "id": "riverside_stilt_house",
+    "name": "Riverside Stilt House",
+    "style": "Southeast Asian-inspired bamboo and timber dwelling",
+    "description": "A raised living floor, shaded fishing deck, long access stair and a small enclosed pond.",
+    "width": 19,
+    "depth": 21,
+    "height": 18,
+    "placed_blocks": 1490,
+    "palette": 35
+  },
+  {
+    "id": "scholar_courtyard",
+    "name": "Scholar's Courtyard",
+    "style": "Chinese scholar courtyard house",
+    "description": "A tiled study, sleeping wing, and kitchen enclose a lotus court with bamboo and covered entry.",
+    "width": 25,
+    "depth": 25,
+    "height": 12,
+    "placed_blocks": 2621,
+    "palette": 54
+  },
+  {
+    "id": "moon_gate_villa",
+    "name": "Moon Gate Villa",
+    "style": "Korean hanok inspired garden residence",
+    "description": "Low dark roofs frame a U-shaped timber home, an open garden, and a quiet pond beside the entry walk.",
+    "width": 29,
+    "depth": 25,
+    "height": 11,
+    "placed_blocks": 2915,
+    "palette": 53
+  },
+  {
+    "id": "mountain_lodge",
+    "name": "Mountain Lodge",
+    "style": "Tibetan inspired raised stone and timber home",
+    "description": "A whitewashed lodge on a broad stone terrace has a timber balcony, capped roof, and stair to a private upper room.",
+    "width": 33,
+    "depth": 27,
+    "height": 18,
+    "placed_blocks": 4049,
+    "palette": 49
+  },
+  {
+    "id": "jade_clan_manor",
+    "name": "Jade Clan Manor",
+    "style": "Chinese axial courtyard family manor",
+    "description": "A red-pillared family compound with two open courts, jade tile roofs, sleeping wings, kitchen, and formal rear hall.",
+    "width": 41,
+    "depth": 37,
+    "height": 11,
+    "placed_blocks": 6614,
+    "palette": 62
+  },
+  {
+    "id": "cloud_pagoda_residence",
+    "name": "Cloud Pagoda Residence",
+    "style": "Japanese pagoda inspired multistory family residence",
+    "description": "Four furnished living floors connected by interior stairs rise over a garden, tea room, and bath annex.",
+    "width": 49,
+    "depth": 45,
+    "height": 41,
+    "placed_blocks": 12122,
+    "palette": 72
+  }
+]

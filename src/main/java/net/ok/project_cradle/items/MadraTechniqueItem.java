@@ -40,6 +40,9 @@ public abstract class MadraTechniqueItem extends Item implements TechniqueItem {
         if (this instanceof AdditionalTechniqueItem extra) {
             tooltip.accept(Component.translatable(extra.getTechnique().descriptionTranslationKey()).withStyle(ChatFormatting.GRAY));
         }
+        if (this instanceof ElementalTechniqueItem elemental) {
+            tooltip.accept(Component.translatable(elemental.getTechnique().descriptionTranslationKey()).withStyle(ChatFormatting.GRAY));
+        }
         Player viewer = context.player();
         if (this instanceof PathTechniqueItem path && path.getTechnique() == PathTechnique.FOX_DREAM) {
             tooltip.accept(Component.translatable("tooltip.project_cradle.fox_dream").withStyle(ChatFormatting.GRAY));

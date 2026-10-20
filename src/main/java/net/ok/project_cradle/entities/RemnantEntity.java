@@ -2,6 +2,8 @@ package net.ok.project_cradle.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashSet;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -36,6 +38,9 @@ import net.ok.project_cradle.capability.madra.MadraType.Element;
 import net.ok.project_cradle.server.progression.RemnantFusionService;
 import net.ok.project_cradle.server.spells.TechniqueVisualService;
 import net.ok.project_cradle.spells.TechniqueScaling;
+import net.ok.project_cradle.spells.TechniqueCatalog;
+import net.ok.project_cradle.server.progression.TechniqueKnowledge;
+import net.ok.project_cradle.server.spells.RemnantTechniqueService;
 
 /** A body of condensed madra, with Vex flight and charge movement beneath its own spirit appearance. */
 public final class RemnantEntity extends Vex {
@@ -43,6 +48,8 @@ public final class RemnantEntity extends Vex {
     private static final EntityDataAccessor<Integer> SECONDARY = SynchedEntityData.defineId(RemnantEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SOURCE_RANK = SynchedEntityData.defineId(RemnantEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FORM = SynchedEntityData.defineId(RemnantEntity.class, EntityDataSerializers.INT);
+
+    private List<String> knownTechniques = List.of();
 
     public RemnantEntity(EntityType<? extends RemnantEntity> type, Level level) {
         super(type, level);
@@ -90,6 +97,13 @@ public final class RemnantEntity extends Vex {
         this.setSpirit(source.getData(ModAttachments.CORE).getAdvancement(),
                 source.getData(ModAttachments.MADRA_TYPE).getTypes(),
                 source instanceof Animal ? RemnantForm.BEAST : RemnantForm.HUMANOID);
+        this.setKnownTechniques(TechniqueKnowledge.capture(source));
+        var core = this.getData(ModAttachments.CORE);
+        core.trySpendSoulfire(core.getSoulfire());
+        core.addSoulfire(source.getData(ModAttachments.CORE).getSoulfire());
+        double reservoir = Mth.clamp(source.getData(ModAttachments.MAXMADRA).getLevel() * 0.65, 60.0, 1_000_000.0);
+        this.getData(ModAttachments.MAXMADRA).setALevel(reservoir);
+        this.getData(ModAttachments.MADRA).setALevel(reservoir);
         // Spirit strength is rank-based, but a death Remnant retains only a fraction of its body's attributes.
         AttributeInstance health = this.getAttribute(Attributes.MAX_HEALTH);
         if (health != null) {
@@ -110,6 +124,23 @@ public final class RemnantEntity extends Vex {
         this.setSpiritData(rank, aspects, form);
         this.setBaseStats(baseHealth(this.getSourceRank()), baseDamage(this.getSourceRank()));
         this.setHealth(this.getMaxHealth());
+        this.setKnownTechniques(List.of(TechniqueCatalog.basic(), TechniqueCatalog.themed(this.getMadraElement())));
+        double reservoir = 100.0 + this.getSourceRank().order() * 40.0;
+        this.getData(ModAttachments.MAXMADRA).setALevel(reservoir);
+        this.getData(ModAttachments.MADRA).setALevel(reservoir);
+    }
+
+    public List<String> getKnownTechniques() { return this.knownTechniques; }
+
+    public void setKnownTechniques(List<String> ids) {
+        var valid = new LinkedHashSet<String>();
+        valid.add(TechniqueCatalog.basic());
+        if (ids != null) for (String id : ids) {
+            String normalized = TechniqueCatalog.normalize(id);
+            if (!normalized.isEmpty() && valid.size() < 64) valid.add(normalized);
+        }
+        if (valid.size() == 1) valid.add(TechniqueCatalog.themed(this.getMadraElement()));
+        this.knownTechniques = List.copyOf(valid);
     }
 
     private void setSpiritData(AdvancementLevel rank, List<Element> aspects, RemnantForm form) {
@@ -160,6 +191,7 @@ public final class RemnantEntity extends Vex {
     @Override
     public void tick() {
         super.tick();
+        if (!this.level().isClientSide() && this.isAlive()) RemnantTechniqueService.tick(this);
         if (!this.level().isClientSide() || !this.isAlive() || this.isInvisible()) return;
         if (this.tickCount % 5 == 0) {
             Element aspect = this.hasSecondaryAspect() && this.tickCount % 10 == 0 ? this.getSecondaryMadraElement() : this.getMadraElement();
@@ -187,6 +219,7 @@ public final class RemnantEntity extends Vex {
 
     @Override
     public boolean doHurtTarget(ServerLevel level, Entity target) {
+        if (target instanceof LivingEntity living && !RemnantTechniqueService.canHarm(this, living)) return false;
         if (!super.doHurtTarget(level, target)) return false;
         if (target instanceof LivingEntity living) {
             this.applyAspect(living, this.getMadraElement());
@@ -228,6 +261,7 @@ public final class RemnantEntity extends Vex {
     @Override
     protected void addAdditionalSaveData(ValueOutput output) {
         super.addAdditionalSaveData(output);
+        output.store("known_techniques", Codec.STRING.listOf(), this.knownTechniques);
         output.putString("spirit_rank", this.getSourceRank().id());
         output.putString("madra_primary", this.getMadraElement().id());
         if (this.hasSecondaryAspect()) output.putString("madra_secondary", this.getSecondaryMadraElement().id());
@@ -249,6 +283,8 @@ public final class RemnantEntity extends Vex {
                 RemnantForm.byId(input.getStringOr("spirit_form", "humanoid")));
         this.setBaseStats(input.getDoubleOr("spirit_health", baseHealth(this.getSourceRank())),
                 input.getDoubleOr("spirit_damage", baseDamage(this.getSourceRank())));
+        this.setKnownTechniques(input.read("known_techniques", Codec.STRING.listOf()).orElseGet(() ->
+                List.of(TechniqueCatalog.basic(), TechniqueCatalog.themed(this.getMadraElement()))));
         this.setHealth(Math.min(savedHealth, this.getMaxHealth()));
     }
 }

@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/dream_snare",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -2383888
+      }
+    ]
+  }
+}

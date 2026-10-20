@@ -17,6 +17,22 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
+    public static final ModConfigSpec.DoubleValue SACRED_BEAST_NATURAL_SPAWN_CHANCE = BUILDER
+            .comment("Chance for a newly spawned vanilla mob to be a sacred variant, including natural spawns and world generation.",
+                    "The default 0.001 is one sacred variant per 1,000 new mob spawns on average.",
+                    "Existing mobs are not rerolled when their chunks load. This setting supersedes sacredBeastSpawnChance.")
+            .defineInRange("sacredBeastNaturalSpawnChance", 0.001, 0.0, 1.0);
+
+    /** Kept so an older config can be loaded without dropping its former value. */
+    @Deprecated
+    public static final ModConfigSpec.DoubleValue SACRED_BEAST_SPAWN_CHANCE = BUILDER
+            .comment("Legacy value retained for compatibility. Use sacredBeastNaturalSpawnChance to control sacred variant rarity.")
+            .defineInRange("sacredBeastSpawnChance", 0.02, 0.0, 1.0);
+
+    public static double sacredBeastSpawnChance() {
+        return SACRED_BEAST_NATURAL_SPAWN_CHANCE.get();
+    }
+
     public static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
             .comment("Whether to log the dirt block on common setup")
             .define("logDirtBlock", true);

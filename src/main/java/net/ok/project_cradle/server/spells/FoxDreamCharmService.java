@@ -55,6 +55,10 @@ public final class FoxDreamCharmService {
 
     private FoxDreamCharmService() { }
 
+    public static boolean isCharmed(Mob mob) {
+        return mob != null && mob.level() instanceof ServerLevel level && activeCharm(level, mob) != null;
+    }
+
     public static boolean activate(ServerPlayer caster) {
         if (!caster.isAlive() || caster.isSpectator()) return false;
         WorldState state = WORLDS.computeIfAbsent(caster.level(), ignored -> new WorldState());
@@ -75,7 +79,8 @@ public final class FoxDreamCharmService {
         WorldState state = WORLDS.get(level);
         long now = level.getGameTime();
         if (state == null || state.auras.getOrDefault(caster.getUUID(), 0L) <= now
-                || activeCharm(level, mob) != null || !isEnemy(caster, null, mob)) return;
+                || activeCharm(level, mob) != null || RemnantTechniqueService.isCharmed(mob)
+                || !isEnemy(caster, null, mob)) return;
         double radius = TechniqueScaling.range(caster, ENEMY_RADIUS);
         Mob enemy = findEnemy(caster, mob, radius);
         if (enemy == null) return;

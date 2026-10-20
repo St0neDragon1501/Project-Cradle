@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_cradle:item/night_veil",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -9539926
+      }
+    ]
+  }
+}

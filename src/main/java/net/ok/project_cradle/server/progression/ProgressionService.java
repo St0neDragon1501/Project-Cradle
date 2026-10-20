@@ -62,6 +62,11 @@ public final class ProgressionService {
 
     /** Activates the user's cycling technique and gathers aura when their stage permits it. */
     public static void cycle(ServerPlayer player) {
+        if (!player.isAlive() || player.isSpectator()) return;
+        long now = player.level().getGameTime();
+        long previous = player.getPersistentData().getLongOr("project_cradle.last_cycle", -10L);
+        if (now >= previous && now - previous < 10L) return;
+        player.getPersistentData().putLong("project_cradle.last_cycle", now);
         Core core = player.getData(ModAttachments.CORE);
         if (core.getAdvancement() == AdvancementLevel.UNFOUNDED) core.setAdvancement(AdvancementLevel.FOUNDATION);
         if ((core.hasSage() || core.isMonarch()) && !player.isShiftKeyDown() && issueSageCommand(player)) return;
@@ -70,26 +75,25 @@ public final class ProgressionService {
         Madra madra = player.getData(ModAttachments.MADRA);
         MadraType type = player.getData(ModAttachments.MADRA_TYPE);
         boolean pure = type.getTypes().size() == 1 && type.getTypes().get(0) == MadraType.Element.PURE;
+        AuraService.Reading reading = AuraService.detect(player);
         if (core.getAdvancement().order() < AdvancementLevel.COPPER.order()) {
             // Foundation training cycles the artist's own pure madra, without sensing environmental aura.
-            maximum.addMaxMadra(1.0);
-            madra.addMadra(10.0, maximum.getLevel());
+            double focus = reading.meditationMultiplier();
+            maximum.addMaxMadra(2.0 * focus);
+            madra.addMadra(20.0 * focus, maximum.getLevel());
         } else {
-            AuraService.Reading reading = AuraService.detect(player);
             double jadeBonus = core.hasJadeSpiral() ? 2.0 : 1.0;
-            double yield = pure ? jadeBonus : reading.compatibleYield(type) * jadeBonus;
-            if (yield > 0.0) {
-                madra.addMadra(pure ? 10.0 * jadeBonus : yield, maximum.getLevel());
-                if (core.getAdvancement().order() <= AdvancementLevel.ARCHLORD.order()) maximum.addMaxMadra(pure ? jadeBonus : yield * 0.2);
-            }
+            double location = pure ? reading.meditationMultiplier() : reading.locationMultiplier(type);
+            if (core.getAdvancement().order() <= AdvancementLevel.ARCHLORD.order()) maximum.addMaxMadra(jadeBonus * location);
+            // Internal recovery remains possible when nearby objects have been depleted.
+            madra.addMadra(pure ? 20.0 * jadeBonus * location : 3.0 + reading.ambientYield(type), maximum.getLevel());
+            if (!pure) AuraService.harvestBest(player, reading);
             if (player.isShiftKeyDown() && core.getAdvancement().order() >= AdvancementLevel.TRUEGOLD.order()) {
                 if (!core.hasSoulspace()) openSoulspace(player);
                 if (core.hasSoulspace() && reading.isBalanced()) {
                     core.addSoulfire(0.1);
                     player.sendOverlayMessage(Component.translatable("message.project_cradle.soulfire_woven"));
                 }
-            } else if (reading.hasAura()) {
-                player.sendOverlayMessage(Component.translatable("message.project_cradle.aura_detected", Component.translatable(reading.aspect().translationKey())));
             }
         }
         evaluateCapacity(player);

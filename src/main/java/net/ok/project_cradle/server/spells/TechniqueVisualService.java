@@ -16,6 +16,7 @@ import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.capability.madra.MadraType;
 import net.ok.project_cradle.items.AdditionalTechniqueItem;
+import net.ok.project_cradle.items.ElementalTechniqueItem;
 import net.ok.project_cradle.items.PathTechniqueItem;
 import net.ok.project_cradle.items.RulerTechniqueItem;
 import net.ok.project_cradle.spells.TechniqueCastProfile;
@@ -40,6 +41,13 @@ public final class TechniqueVisualService {
     }
 
     private static double areaRadius(ItemStack stack) {
+        if (stack.getItem() instanceof ElementalTechniqueItem item) return switch (item.getTechnique()) {
+            case FLAME_RING, FROST_NOVA -> 5.0;
+            case REPULSION_WAVE -> 6.0;
+            case STONE_AEGIS -> 1.0;
+            // Persistent fields and aimed techniques draw at their own centers.
+            default -> 0.0;
+        };
         if (stack.getItem() instanceof RulerTechniqueItem) return 7.0;
         if (stack.getItem() instanceof PathTechniqueItem item) return switch (item.getTechnique()) {
             case VOID_DRAGONS_DANCE, WIND_PRESSURE -> 7.0;

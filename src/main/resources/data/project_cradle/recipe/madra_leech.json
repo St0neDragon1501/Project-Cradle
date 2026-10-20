@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "CBC",
+    " D "
+  ],
+  "key": {
+    "A": "minecraft:rotten_flesh",
+    "C": "minecraft:amethyst_shard",
+    "B": "minecraft:book",
+    "D": "minecraft:ender_pearl"
+  },
+  "result": {
+    "id": "project_cradle:madra_leech",
+    "count": 1
+  }
+}

@@ -16,6 +16,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -32,7 +33,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.ok.project_cradle.ProjectCradle;
+import net.ok.project_cradle.capability.ModAttachments;
 import net.ok.project_cradle.spells.TechniqueScaling;
+import net.ok.project_cradle.server.spells.MobTechniqueService;
 
 /** Stationary, solid arcane wall. A thin cardinal hitbox matches its visible plane. */
 @EventBusSubscriber(modid = ProjectCradle.MODID)
@@ -55,11 +58,15 @@ public final class MadraShieldEntity extends Entity {
     }
 
     public MadraShieldEntity(ServerLevel level, ServerPlayer caster) {
+        this(level, caster, (float) (BASE_MAX_HEALTH * TechniqueScaling.power(caster)),
+                TechniqueScaling.duration(caster, LIFETIME_TICKS));
+    }
+
+    private MadraShieldEntity(ServerLevel level, LivingEntity caster, float maximum, int lifetime) {
         this(ModEntities.MADRA_SHIELD.get(), level);
-        float maximum = (float) (BASE_MAX_HEALTH * TechniqueScaling.power(caster));
         this.entityData.set(MAX_HEALTH, maximum);
         this.entityData.set(HEALTH, maximum);
-        this.entityData.set(REMAINING, TechniqueScaling.duration(caster, LIFETIME_TICKS));
+        this.entityData.set(REMAINING, lifetime);
         this.entityData.set(OWNER, caster.getUUID().toString());
         Direction facing = Direction.fromYRot(caster.getYRot());
         this.entityData.set(NORMAL_X, facing.getAxis() == Direction.Axis.X);
@@ -70,7 +77,20 @@ public final class MadraShieldEntity extends Entity {
     /** Placement and replacement only; the spell casting service owns payment and cooldown. */
     public static boolean spawn(ServerPlayer caster) {
         if (caster == null || !caster.isAlive() || caster.isSpectator()) return false;
-        ServerLevel level = caster.level();
+        return spawn(caster, new MadraShieldEntity(caster.level(), caster));
+    }
+
+    /** Sacred creatures and Remnants share the physical barrier and collision rules used by players. */
+    public static boolean spawn(Mob caster) {
+        if (caster == null || !MobTechniqueService.isCaster(caster) || !caster.isAlive() || caster.isSpectator()
+                || !(caster.level() instanceof ServerLevel level)) return false;
+        float maximum = (float) (BASE_MAX_HEALTH * MobTechniqueService.power(caster));
+        int lifetime = (int) Math.round(LIFETIME_TICKS * (1.0 + 0.05 * Math.max(0, caster.getData(ModAttachments.CORE).getAdvancement().order() - 1)));
+        return spawn(caster, new MadraShieldEntity(level, caster, maximum, lifetime));
+    }
+
+    private static boolean spawn(LivingEntity caster, MadraShieldEntity shield) {
+        if (!(caster.level() instanceof ServerLevel level)) return false;
         Direction facing = Direction.fromYRot(caster.getYRot());
         Vec3 direction = new Vec3(facing.getStepX(), 0.0, facing.getStepZ());
         Vec3 start = caster.getEyePosition();
@@ -78,7 +98,6 @@ public final class MadraShieldEntity extends Entity {
         HitResult hit = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
         double distance = hit.getType() == HitResult.Type.MISS ? 2.5 : start.distanceTo(hit.getLocation()) - 0.24;
         if (distance < 1.0) return false;
-        MadraShieldEntity shield = new MadraShieldEntity(level, caster);
         Vec3 location = caster.position().add(direction.scale(distance)).add(0.0, 0.02, 0.0);
         shield.setPos(location);
         if (!shield.hasClearPlacement(caster) || !level.addFreshEntity(shield)) return false;
@@ -96,7 +115,7 @@ public final class MadraShieldEntity extends Entity {
         return true;
     }
 
-    private boolean hasClearPlacement(ServerPlayer caster) {
+    private boolean hasClearPlacement(Entity caster) {
         AABB bounds = this.getBoundingBox().deflate(0.01);
         for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(bounds.minX, bounds.minY, bounds.minZ),
                 BlockPos.containing(bounds.maxX, bounds.maxY, bounds.maxZ))) {
@@ -140,12 +159,15 @@ public final class MadraShieldEntity extends Entity {
     public int getHitFlashTicks() { return this.entityData.get(HIT_FLASH); }
     public boolean isNormalX() { return this.entityData.get(NORMAL_X); }
     public String getOwnerId() { return this.entityData.get(OWNER); }
-    public boolean isOwnedBy(Player player) { return player != null && player.getUUID().toString().equals(this.getOwnerId()); }
+    public boolean isOwnedBy(Entity owner) { return owner != null && owner.getUUID().toString().equals(this.getOwnerId()); }
 
-    public ServerPlayer getOwner() {
+    public LivingEntity getOwner() {
         if (!(this.level() instanceof ServerLevel level)) return null;
         try {
-            return level.getServer().getPlayerList().getPlayer(UUID.fromString(this.getOwnerId()));
+            UUID ownerId = UUID.fromString(this.getOwnerId());
+            ServerPlayer player = level.getServer().getPlayerList().getPlayer(ownerId);
+            if (player != null) return player;
+            return level.getEntity(ownerId) instanceof LivingEntity living ? living : null;
         } catch (IllegalArgumentException exception) {
             return null;
         }
@@ -156,7 +178,7 @@ public final class MadraShieldEntity extends Entity {
         // Do not run gravity, fluid movement or portals on a fixed spell wall.
         this.setDeltaMovement(Vec3.ZERO);
         if (!(this.level() instanceof ServerLevel)) return;
-        ServerPlayer owner = this.getOwner();
+        LivingEntity owner = this.getOwner();
         if (owner == null || !owner.isAlive() || owner.level() != this.level() || owner.isSpectator()) {
             this.discard();
             return;
@@ -192,10 +214,11 @@ public final class MadraShieldEntity extends Entity {
         // for which NeoForge does not fire another ProjectileImpactEvent.
         if (source.getDirectEntity() instanceof Projectile projectile) projectile.discard();
         if (this.isInvulnerableToBase(source) || !Float.isFinite(amount) || amount <= 0.0F) return false;
-        ServerPlayer owner = this.getOwner();
+        LivingEntity owner = this.getOwner();
         Entity attacker = source.getEntity();
         if (attacker != null && attacker.getUUID().toString().equals(this.getOwnerId())) return false;
-        if (owner != null && attacker instanceof Player player && !player.canHarmPlayer(owner)) return false;
+        if (owner instanceof Player protectedPlayer && attacker instanceof Player player && !player.canHarmPlayer(protectedPlayer)) return false;
+        if (owner instanceof Mob mob && attacker instanceof LivingEntity living && MobTechniqueService.isFriendly(mob, living)) return false;
         this.entityData.set(HEALTH, Mth.clamp(this.getHealth() - amount, 0.0F, this.getMaxHealth()));
         this.entityData.set(HIT_FLASH, 6);
         Vec3 center = this.getBoundingBox().getCenter();
