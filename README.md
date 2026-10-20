@@ -7,12 +7,39 @@ The progression follows the books' distinction between power, a sound foundation
 ## Starting your Path
 
 - New players begin at **Foundation with pure madra**. A core does not need to be unlocked with an item.
-- Press **K** to cycle your own madra and grow your capacity. At **1,200 maximum madra**, you advance to Copper.
+- Hold **K** to keep cycling your own madra and grow your capacity. At **1,200 maximum madra**, you advance to Copper.
 - The **Foundation Cycling Manual** is an optional tutorial item. Hold right-click for five seconds to complete its tutorial and receive a Tattered Manual if you have never crafted one. The manual reports your current progression requirement.
 - Foundation artists cycle their own madra. At Copper, environmental aura becomes available for compatible Paths. **Pure madra has no environmental aura source**; pure artists continue strengthening and recovering their own madra through cycling.
 - The Madra Detector helps identify nearby aura. Madra aspect tuning items become usable at Copper.
 
 Core progress is saved with the player and survives death. Older saves keep their achieved ranks and gain the preparation records needed to support those ranks; legacy Unfounded characters now begin at Foundation. The HUD shows current/maximum madra, aspects, rank, Goldsign, soulfire, Icons, training progress, and the next requirement.
+
+## Cycling and gathering
+
+Holding **K** performs a cycling exercise every half second. At Copper and above, elemental Paths automatically gather from the richest compatible object within four blocks while cycling. Basic internal recovery also works when every nearby source has been depleted. Foundation and Pure artists recover their own madra internally; natural Pure aura is never created. Pleasant outdoor or living surroundings improve their concentration. Sage artists use **Shift + K** to cycle, retaining the existing unmodified K authority command.
+
+Use the **Madra Detector** on a block or creature to gather from that exact source. Use it in the air to choose a nearby compatible source automatically. At Jade, **Shift + use in the air** retains nearby artist sensing. Harvesting refills the core's **existing madra types** and never changes the Path or raises maximum capacity by itself. Cycling remains the training route for growing capacity.
+
+Every harvested block or creature needs **30 seconds of loaded world time** to recharge. The timer is shared by players, so changing players, hands, or tools cannot bypass it. Block timers are saved by position; breaking and replacing the block does not clear them. Creature timers survive loading, portals, and conversions. Gathering from a full core or an incompatible object does not deplete it. The Detector shows the remaining recharge time when a chosen source is exhausted. Sources are not broken or hurt by gathering.
+
+Both the material and the location affect yields. Rich objects provide a bigger burst, a matching biome improves that burst, and nearby sources become unavailable until their own timers finish. Ambient location bonuses are weaker steady recovery; they are not another harvest of a depleted object. Jade spirals improve gathering further. Examples:
+
+| Madra | Example objects | Favorable places or conditions |
+| --- | --- | --- |
+| Fire | Lit campfires, lava, magma, burning furnaces | Nether, hot sunny deserts |
+| Water | Water, ice, snow, wet sponge | Oceans, rivers, rain, snowy biomes |
+| Air | Wool, banners, cobwebs, note blocks | Open sky, mountains, storms |
+| Earth | Stone, soil, ores, mineral blocks | Caves, mountains, badlands |
+| Life | Logs, leaves, crops, flowers, living creatures | Forests, jungles, lush caves |
+| Death | Bones, soul sand, skulls, undead creatures | Soul Sand Valley, Deep Dark |
+| Light | Lamps, torches, glow blocks, beacons | Daylight under open sky |
+| Shadow | Obsidian, tinted glass, dark underground stone | Night, dark caves, Pale Garden |
+| Blood | Redstone, nether wart, crimson growths, creatures | Crimson Forest |
+| Dream | Amethyst, beds, bookshelves, enchanting tables | Night, flower meadows, warped forests |
+| Destruction | TNT, magma, respawn anchors | Basalt Deltas, storms |
+| Force | Pistons, anvils, rails, slime blocks | Storms, windy mountains |
+| Sword | Metals, anvils, copper, ancient debris | Stony or jagged peaks |
+| Hunger | Sculk, soul sand, ender chests, composters | Deep Dark, End |
 
 ## Building a foundation
 
@@ -70,6 +97,55 @@ Hair and eyes follow the head; hands, bracers, and serpents follow their arms; w
 
 Remnants, sacred beasts, wild spirits, and sacred herbs provide world encounters and progression resources. Remnants use a custom spirit model; the other encounters retain their existing Minecraft adaptations.
 
+## Cradle houses
+
+Ten furnished, Asian-architecture-inspired homes can generate in new Overworld terrain. Their complete footprints, including roof overhangs, remain between **5 and 50 blocks on each side**. The smallest is 5×7; the largest is 49×45. The tallest structure is 41 blocks. The collection includes timber cottages, tiled-roof shop houses, a raised bamboo dwelling, Chinese-inspired courtyards, a Korean hanok-inspired garden villa, a Tibetan-inspired mountain lodge, and a Japanese pagoda-inspired residence.
+
+| House | Footprint | Structure ID |
+| --- | --- | --- |
+| Bamboo Hermitage | 5 × 7 | `bamboo_hermitage` |
+| Cherry Tea House | 11 × 13 | `cherry_tea_house` |
+| Cedar Minka | 15 × 17 | `cedar_minka` |
+| Lantern Shop House | 13 × 19 | `lantern_shop_house` |
+| Riverside Stilt House | 19 × 21 | `riverside_stilt_house` |
+| Scholar's Courtyard | 25 × 25 | `scholar_courtyard` |
+| Moon Gate Villa | 29 × 25 | `moon_gate_villa` |
+| Mountain Lodge | 33 × 27 | `mountain_lodge` |
+| Jade Clan Manor | 41 × 37 | `jade_clan_manor` |
+| Cloud Pagoda Residence | 49 × 45 | `cloud_pagoda_residence` |
+
+The houses use vanilla materials, framed windows, raised entries, tiled or timber roofs, beds, storage, workstations, and supported lighting. Larger homes add gardens, ponds, balconies, and internal stair flights. The pagoda residence has four connected living floors. They are decorative residential interpretations, with Minecraft proportions and materials.
+
+Natural generation selects one design from a shared structure set in plains, forests, taigas, bamboo jungles, cherry groves, and meadows. A placement region is 32×32 chunks, with 12 chunks of separation; terrain and biome suitability can skip a candidate. Houses appear in newly generated terrain. Their templates and data-driven world-generation definitions require no extra client renderer.
+
+With operator permissions, place a house in an existing world:
+
+```mcfunction
+/place template project_cradle:houses/cherry_tea_house ~8 ~-1 ~8
+```
+
+Replace `cherry_tea_house` with any ID from the table. The template origin is its lowest corner; local Y=0 is the embedded foundation and Y=1 is the main floor for most designs. The stilt house and lodge have raised floors. Optional rotations include `clockwise_90`, `180`, and `counterclockwise_90`. To find a naturally generated example:
+
+```mcfunction
+/locate structure project_cradle:jade_clan_manor
+```
+
+Templates live in `src/main/resources/data/project_cradle/structure/houses/`. Their reproducible, dependency-free generator is `tools/structures/generate_houses.py`; run it with Python 3 to rebuild the NBT files and `docs/house_catalog.json`.
+
+## Sacred vanilla mobs
+
+Every vanilla mob species can appear as a **sacred variant**, including animals, aquatic life, villagers, monsters, utility mobs, and bosses. New vanilla mob spawns, including natural spawns and world generation, have a **0.1% chance (1 in 1,000)** by default. The common-config setting `sacredBeastNaturalSpawnChance` controls this rarity and supersedes the old `sacredBeastSpawnChance` setting, so an existing config's former 2% default does not keep the old spawn rate. This replaces a small share of ordinary spawns; it does not add another population of mobs. The same selection also covers breeding, spawn eggs, and summoned vanilla mobs. Existing ordinary mobs are not rerolled when their chunks load.
+
+Transforming into a sacred variant now grants a distinct physical appearance. Most grow **15% larger**, with solid features suited to their species and colored by their one or two madra types: horned crowns and dorsal crystals on land beasts, extended crests and feather growths on flying creatures, fins and side scales on aquatic mobs, spiked carapaces on arthropods, crystalline shoulder mantles and coronets on humanoids, and bright cores and crystal growths on cube-like creatures. The Dragon keeps its multipart size and gains its own ridge and horn decorations. Four stable growth variations provide additional differences between individuals. These features supplement the original animated body and equipment; they occupy no equipment slots. Golden names and a few madra-colored motes also identify sacred creatures.
+
+The appearance is chosen on the server, saved, and sent to everyone tracking the creature. It applies to natural sacred spawns, command transformations, century awakenings, and existing sacred beasts after loading. Conversions preserve the same madra colors and growth variation. Sacred variants also gain extra health, attack strength, speed, and knockback resistance. Ordinary species start at Lowgold; powerful creatures have higher ranks, up to Archlord for the Dragon and Wither.
+
+Each variant retains **one or two saved techniques**: Basic Striker, usually joined by a species-themed skill. Ordinary sacred creatures have a 75% chance of a second skill; Underlord and stronger creatures always have one. When a second skill is assigned, it has a one-in-three chance to be a new elemental technique matching one of the creature’s madra aspects, chosen equally between its aspects; otherwise it uses the existing species skill. Examples include Water/Ice Lance or Frost Nova aquatic creatures, a Dream/Light fox with Fox Dream, Dream Snare, or Solar Beam, Fire/Destruction Nether creatures, and Sword/Force iron golems. Existing creatures retain their saved skills. Hostile mobs use their normal targets; peaceful creatures use techniques to defend themselves when attacked. Technique preparation, madra costs, regeneration, cooldowns, and rank scaling run on the server. Tame owners, sacred contract partners, and allies are protected by the technique targeting rules.
+
+On death, a sacred creature leaves **one Remnant carrying its madra and techniques**, including deaths from a Creeper's own explosion. Defeating that Remnant supplies the existing typed binding and one known technique. Conversions retain the original sacred spirit without a new rarity roll. A splitting Slime or Magma Cube leaves its spirit once; its smaller offspring are ordinary creatures. Remnants retain the normal monster restriction in Peaceful difficulty.
+
+Operators can awaken an existing vanilla mob with `/cradle sacred_beast <targets>`. For example, `/cradle sacred_beast @e[type=minecraft:cow,sort=nearest,limit=1]` awakens the nearest cow. Already sacred creatures are skipped.
+
 ## Remnants
 
 A **Remnant** is now a registered custom spirit mob (`project_cradle:remnant`), with its own appearance. It floats and phases through obstacles, charges at enemies, and has a translucent body wrapped around a bright madra core. Glowing channels, eyes, wispy ribbons, and a few drifting motes show its spirit nature. Its colors retain one or two madra aspects; stronger ranks make a slightly denser, larger spirit.
@@ -82,7 +158,13 @@ Developed spirits leave a Remnant on death from **Iron onward**. Sacred beasts a
 
 Existing spirits cannot leave another Remnant. Wild spirits, Dreadbeasts, Dreadgods, and entities with a destroyed spirit are excluded. Entities tagged `project_cradle.dreadbeast` or `project_cradle.spirit_destroyed` are explicitly excluded; the latter also supports a persistent boolean of the same name. These markers support future encounters and world configuration. Ordinary flowers, logs, and animals do not automatically become sacred spirits.
 
-Defeating an ordinary Remnant drops a **Remnant Binding** retaining its primary aspect for the existing compatible Jade-to-Lowgold route. Personal Remnants manifested with a **Spirit Mirror** use this custom mob too, with the existing Archlord requirements, owner-linked challenge, and time limit. They grant fusion through that challenge rather than ordinary loot or experience, and cannot be diverted by Fox Dream. Previously saved Vex-based Remnants remain compatible with their original binding drops and challenge tracking; new formations use the custom entity.
+Defeating any Remnant drops exactly one **Remnant Binding**, labeled with its source madra (for example, **Remnant Binding: Fire + Dream**), plus **one technique item the Remnant knows**. Both aspects remain stored on a dual binding, and a compatible Jade artist can absorb it using either matching aspect. Different madra bindings remain separate stacks. Technique drops prefer a known technique other than Basic Striker when one is available. Personal Remnants manifested with a **Spirit Mirror** use this custom mob too, with the existing Archlord requirements, owner-linked challenge, and time limit. They still grant fusion through that challenge and cannot be diverted by Fox Dream. They now drop the same binding and one known technique as other Remnants, while retaining zero experience rewards. Previously saved Vex-based Remnants remain compatible with typed binding drops and challenge tracking; their technique drop uses a madra-themed default. New formations use the custom entity.
+
+### Inherited techniques
+
+Every Remnant knows **Basic Striker** and at least one additional technique. Ordinary spirits receive an instinctive technique suited to their primary madra. A player's Remnant inherits a snapshot of all supported technique items carried in their inventory, independent quick slots, and soulspace, together with techniques they have successfully cast. Existing Minecraft item-use statistics recover techniques practiced before explicit history tracking was added. The snapshot is retained when the Remnant is saved; changing the living player's inventory later cannot change it. Existing spirits without saved techniques receive Basic Striker and a madra-themed technique on loading.
+
+Remnants use their known attacks, self-enforcement, protection, and control techniques through server-controlled casting with preparation, cooldowns, and a regenerating madra reservoir. Combat chooses techniques that fit the current target and situation; a technique that has no valid effect is skipped rather than charging madra for a failed cast. Player Counterspell can interrupt a Remnant's preparation. Player-only effects are adapted to mob combat, and charm never controls players or pets.
 
 The **Remnant Spawn Egg** is in the Project Cradle creative tab. Operators can also place spirits with:
 
@@ -175,7 +257,7 @@ Vanilla double-jump can also start flight. While flying, Space controls ascent a
 
 ## Techniques and items
 
-The **Project Cradle** creative tab contains progression items, resources, aspect items, and techniques. There are **29 named Path techniques**, each with its own item and registered technique entity:
+The **Project Cradle** creative tab contains progression items, resources, aspect items, and **56 reusable techniques**: Basic Striker, the three general sacred arts, 29 named Path techniques, eight general spells, and 15 elemental techniques. The **29 named Path techniques** each have their own item and registered technique entity:
 
 - **Blackflame:** Dragon's Breath, Burning Cloak, Void Dragon's Dance, Dragon Descends.
 - **White Fox:** Fox Fire, Invisible Flame, Phantom Lights, Fox Tail, Fox Dream, Fox Mirror.
@@ -215,6 +297,36 @@ These reusable technique items can be crafted or found in the Project Cradle cre
 | Gravity Well | 35 | 1.2 s | 8 s | Place a five-second vortex at your aim point. It pulls nearby foes inward and deals periodic technique damage. |
 
 Recipes use a book and amethyst shards with ingredients suited to the spell: iron/prismarine for Shield, fire charge/blaze powder for Fireball, snow/prismarine for Ice Lance, copper/blaze rod for Chain Lightning, ender pearls/obsidian for Blink, ghast tear/glistering melon for Healing Pulse, lapis/quartz for Counterspell, and echo shard/obsidian for Gravity Well. Technique items are reusable; casting consumes madra.
+
+### Fifteen elemental techniques
+
+Each madra aspect has an additional reusable technique item, with its own crafting recipe, icon, and effect description. Find them in the **Project Cradle creative tab**, craft them with a book, amethyst shards, and aspect ingredients, or obtain one through an inheriting Remnant's technique drop. They work from your hand and unlocked spell-wheel slots. Their listed aspect describes the technique; your core's current aspects still supply your Gold passives.
+
+| Technique | Aspect | Base madra | Effect |
+| --- | --- | --- | --- |
+| Flame Ring | Fire | 24 | Burn nearby foes in a ring around the caster. |
+| Frost Nova | Water | 26 | Chill and slow nearby foes with a freezing burst. |
+| Gale Step | Air | 16 | Dash along your aim through clear space and push nearby foes aside. |
+| Stone Aegis | Earth | 28 | Gain a temporary protective shell of absorption and resistance. |
+| Spirit Sever | Pure | 24 | Disrupt an aimed foe's technique preparation and weaken them. |
+| Bloom Field | Life | 32 | Place a six-second healing field for yourself and nearby allies. |
+| Withering Touch | Death | 22 | Inflict wither and damage in a short cone. |
+| Solar Beam | Light | 30 | Strike along a bright, aimed ray that stops at walls. |
+| Night Veil | Shadow | 20 | Become briefly invisible and move faster. |
+| Crimson Siphon | Blood | 26 | Drain a visible foe and recover health from damage actually dealt. |
+| Dream Snare | Dream | 24 | Slow and weaken a visible foe, interrupting preparation. |
+| Ruin Burst | Destruction | 34 | Detonate a burst of destructive madra at your aim point. |
+| Repulsion Wave | Force | 22 | Push nearby foes back with a radial force blast. |
+| Blade Tempest | Sword | 32 | Surround yourself with three pulses of cutting madra. |
+| Madra Leech | Hunger | 24 | Damage a visible foe and steal a limited amount of their remaining madra. |
+
+The elemental techniques use the same advancement and core-refinement scaling for madra cost, damage, reach, and applicable durations as existing techniques. Persistent fields expire and do not accumulate when recast. Siphons recover only resources actually removed from valid targets. Techniques respect allied targeting, PvP permissions, line of sight, and collision checks. Remnants can inherit, cast, and drop these techniques; new sacred beasts can receive a matching elemental technique as their second skill, passing it to their Remnant on death. All gameplay effects run on the server.
+
+Example operator item command:
+
+```mcfunction
+/give @s project_cradle:solar_beam
+```
 
 ### Casting and progression
 

@@ -21,6 +21,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.ok.project_cradle.ProjectCradle;
 import net.ok.project_cradle.spells.PathTechnique;
 import net.ok.project_cradle.spells.AdditionalTechnique;
+import net.ok.project_cradle.spells.ElementalTechnique;
 import net.ok.project_cradle.capability.core.IronBodyType;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
@@ -54,6 +55,11 @@ public class ModItems {
     public static final List<DeferredItem<Item>> ADDITIONAL_TECHNIQUES = Arrays.stream(AdditionalTechnique.values())
             .map(technique -> ITEMS.<Item>registerItem(technique.id(),
                     properties -> new AdditionalTechniqueItem(properties.stacksTo(1), technique)))
+            .toList();
+
+    public static final List<DeferredItem<Item>> ELEMENTAL_TECHNIQUES = Arrays.stream(ElementalTechnique.values())
+            .map(technique -> ITEMS.<Item>registerItem(technique.id(),
+                    properties -> new ElementalTechniqueItem(properties.stacksTo(1), technique)))
             .toList();
 
     public static final DeferredItem<Item> FORGER_TECHNIQUE = ITEMS.registerItem("forger_technique",
